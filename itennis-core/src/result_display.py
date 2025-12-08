@@ -169,12 +169,24 @@ class ResultDisplay:
         for dim in result.advantages:
             dim_name = self.config_manager.get_dimension_name(dim)
             score = result.dimension_scores.get(dim, 0)
-            comment = result.dimension_comments.get(dim, "")
+            
+            # 获取现状表现（从dimension_suggestions.json）
+            current_state = self.config_manager.get_dimension_suggestion(dim, score)
+            
+            # 获取优势利用建议（从tennis_knowledge.json）
+            advantage_suggestion = self.config_manager.get_advantage_suggestion(dim)
             
             print(f"- {dim_name}（约 {score:.1f} 级）：")
-            # 直接展示评语内容，避免重复描述
-            if comment:
-                print(f"  {comment}")
+            if current_state:
+                # 分割现状描述和建议，提取现状部分
+                current_lines = [line.strip() for line in current_state.split('。') if line.strip()]
+                if current_lines:
+                    # 显示现状表现（第一句作为现状描述）
+                    print(f"  {current_lines[0]}。")
+            
+            # 显示如何继续放大优势/作为得分手段
+            if advantage_suggestion:
+                print(f"  {advantage_suggestion}")
             print()
     
     def _display_detailed_improvements(self, result: EvaluateResult) -> None:
@@ -188,15 +200,28 @@ class ResultDisplay:
         for dim in result.weaknesses:
             dim_name = self.config_manager.get_dimension_name(dim)
             score = result.dimension_scores.get(dim, 0)
-            comment = result.dimension_comments.get(dim, "")
+            
+            # 获取现状问题描述（从dimension_suggestions.json）
+            current_state = self.config_manager.get_dimension_suggestion(dim, score)
+            
+            # 获取具体练习方向（从tennis_knowledge.json）
+            improvement_suggestion = self.config_manager.get_improvement_suggestion(dim)
             
             print(f"- {dim_name}（约 {score:.1f} 级）：")
-            # 直接展示评语内容，避免重复描述
-            if comment:
-                print(f"  {comment}")
+            if current_state:
+                # 分割描述，提取现状问题部分
+                current_lines = [line.strip() for line in current_state.split('。') if line.strip()]
+                if current_lines:
+                    # 显示现状问题（第一句作为问题描述）
+                    print(f"  {current_lines[0]}。")
+            
+            # 显示具体练习方向
+            if improvement_suggestion:
+                print(f"  {improvement_suggestion}")
             print()
         
-        print(self.config_manager.get_general_training_advice("focus_on_weakness"))
+        # 添加总结句
+        print("如果你只想抓重点，建议优先在上述 2～3 个方向投入练习时间。")
         print()
     
     def _display_dimension_details_expanded(self, result: EvaluateResult) -> None:
@@ -215,12 +240,22 @@ class ResultDisplay:
                     if dim in result.dimension_scores:
                         dim_name = self.config_manager.get_dimension_name(dim)
                         score = result.dimension_scores[dim]
-                        comment = result.dimension_comments.get(dim, "暂无评语")
+                        
+                        # 获取基础评语（从dimension_suggestions.json）
+                        base_comment = self.config_manager.get_dimension_suggestion(dim, score)
+                        
+                        # 获取相对评语（基于分数相对整体的差异）
+                        diff = score - result.rounded_level
+                        if diff >= 0.5:
+                            relative_comment = "你在这一项上明显高于整体水平，可以把它当成比赛中的主要得分手段之一。"
+                        elif diff <= -0.5:
+                            relative_comment = "这一项相对是短板，会在比赛中拖慢整体上限，建议作为近期重点练习方向。"
+                        else:
+                            relative_comment = "这一项与整体水平大体一致，可以在保持稳定的基础上，循序渐进地提高质量。"
                         
                         print(f"【{dim_name}（约 {score:.1f} 级）】")
-                        # 分离基础评语和相对评语
-                        base_comment, relative_comment = self._split_dimension_comment(comment, score, result.rounded_level)
-                        print(f"{base_comment}")
+                        if base_comment:
+                            print(f"{base_comment}")
                         print(f"{relative_comment}")
                         print()
     
