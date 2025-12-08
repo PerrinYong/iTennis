@@ -128,6 +128,40 @@ def display_result(name: str, result: EvaluateResult) -> None:
     print(f"\n💪 主要优势: {', '.join([NTRPEvaluator.DIMENSION_META.get(d, d) for d in result.advantages[:3]])}")
     print(f"🎯 提升重点: {', '.join([NTRPEvaluator.DIMENSION_META.get(d, d) for d in result.weaknesses[:3]])}")
     
+    # 展示图表数据
+    if result.chart_data:
+        print(f"\n{'='*50}")
+        print("  📈 图表数据详情")
+        print(f"{'='*50}")
+        
+        # 雷达图数据
+        radar = result.chart_data.radar_data
+        print(f"\n🎯 雷达图数据（核心技术维度）:")
+        for i, (dim, label, score) in enumerate(zip(radar.dimensions, radar.dimension_labels, radar.scores)):
+            print(f"  {label}: {score:.1f}% (原始: {result.dimension_scores[dim]:.1f}级)")
+        
+        # 分组条形图数据
+        print(f"\n📊 分组条形图数据:")
+        for group in result.chart_data.bar_groups:
+            print(f"\n  【{group.group_name}】")
+            for dim_data in group.dimensions:
+                tag_emoji = {"优势": "🟢", "均衡": "🟡", "短板": "🔴"}[dim_data.tag.value]
+                print(f"    {dim_data.label}: {dim_data.score:.1f}级 ({dim_data.normalized_score:.0f}%) {tag_emoji}")
+                if dim_data.short_comment:
+                    print(f"      💬 {dim_data.short_comment}")
+        
+        # 训练优先级
+        if result.chart_data.priority_list:
+            print(f"\n🏃‍♂️ 训练优先级建议:")
+            priority_emojis = ["🥇", "🥈", "🥉"]
+            for item in result.chart_data.priority_list:
+                emoji = priority_emojis[item.rank - 1] if item.rank <= 3 else "🏅"
+                print(f"  {emoji} 第{item.rank}位: {item.label}")
+                print(f"      📉 差距: {item.gap:.1f}级 ({item.normalized_gap:.0f}%)")
+                print(f"      📚 建议: {item.suggestion}")
+        else:
+            print(f"\n🎉 各维度发展均衡，可以全面提升！")
+    
     print(f"\n📝 详细评语:")
     print("-" * 40)
     print(result.summary_text)

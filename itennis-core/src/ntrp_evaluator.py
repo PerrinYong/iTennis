@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any, Tuple
+from enum import Enum
 import json
 import math
 import pathlib
@@ -16,6 +17,60 @@ import pathlib
 # =========================
 #  基本数据结构
 # =========================
+
+class DimensionTag(Enum):
+    """维度标签枚举"""
+    ADVANTAGE = "优势"
+    BALANCED = "均衡"
+    WEAKNESS = "短板"
+
+
+@dataclass
+class RadarChartData:
+    """雷达图数据"""
+    dimensions: List[str]              # 维度名称列表
+    dimension_labels: List[str]        # 维度显示标签列表
+    scores: List[float]                # 各维度分数(0-100)
+    max_score: float = 100.0          # 最大分数
+    
+
+@dataclass
+class DimensionBarData:
+    """单个维度条形图数据"""
+    dimension: str                     # 维度key
+    label: str                         # 显示名称
+    score: float                       # 原始分数
+    normalized_score: float            # 归一化分数(0-100)
+    tag: DimensionTag                  # 标签类型
+    short_comment: str                 # 简短评语
+    full_comment: str                  # 完整评语
+
+
+@dataclass
+class BarChartGroup:
+    """条形图分组数据"""
+    group_name: str                    # 分组名称
+    dimensions: List[DimensionBarData] # 该组的维度数据
+
+
+@dataclass
+class PriorityItem:
+    """训练优先级项目"""
+    rank: int                          # 排名(1,2,3)
+    dimension: str                     # 维度key
+    label: str                         # 显示名称
+    gap: float                         # 与整体水平差值
+    normalized_gap: float              # 归一化差值(0-100)
+    suggestion: str                    # 训练建议
+
+
+@dataclass
+class ChartData:
+    """完整图表数据"""
+    radar_data: RadarChartData         # 雷达图数据
+    bar_groups: List[BarChartGroup]    # 分组条形图数据
+    priority_list: List[PriorityItem]  # 优先级列表
+
 
 @dataclass
 class OptionConfig:
@@ -48,6 +103,7 @@ class EvaluateResult:
     weaknesses: List[str]                  # 短板维度 key 列表
     summary_text: str                      # 总结长文案
     support_distribution: Dict[float, float]  # 各等级支持度分布（调试用）
+    chart_data: Optional['ChartData'] = None  # 图表数据
 
 
 # =========================
@@ -93,6 +149,19 @@ class NTRPEvaluator:
         "tactics": "战术与心理",
         "match_result": "实战成绩",
         "training": "训练背景 / 频率",
+    }
+
+    # 雷达图核心维度（最多8个）
+    RADAR_DIMENSIONS = [
+        "baseline", "forehand", "backhand", "serve", 
+        "return", "net", "footwork", "tactics"
+    ]
+
+    # 维度分组配置（用于条形图）
+    DIMENSION_GROUPS = {
+        "基础技术": ["baseline", "forehand", "backhand", "serve", "return"],
+        "网前&移动": ["net", "footwork"],
+        "比赛&经验": ["tactics", "match_result", "training"]
     }
 
     def __init__(
@@ -209,6 +278,13 @@ class NTRPEvaluator:
             weaknesses,
         )
 
+        # 7) 生成图表数据
+        chart_data = self._build_chart_data(
+            dimension_scores,
+            dimension_comments,
+            rounded_level
+        )
+
         return EvaluateResult(
             total_level=raw_level,
             rounded_level=rounded_level,
@@ -219,6 +295,7 @@ class NTRPEvaluator:
             weaknesses=weaknesses,
             summary_text=summary,
             support_distribution=support.copy(),
+            chart_data=chart_data,
         )
 
     # =========================
@@ -396,7 +473,7 @@ class NTRPEvaluator:
     @staticmethod
     def _first_sentence(text: str) -> str:
         """
-        截取评语的第一句，作为"短标签"。
+        截取评语的第一句，作为“短标签”。
         用简单的句号/感叹号分割。
         """
         if not text:
@@ -406,6 +483,158 @@ class NTRPEvaluator:
                 idx = text.find(sep)
                 return text[: idx + 1]
         return text
+
+    # =========================
+    #  图表数据生成
+    # =========================
+
+    def _build_chart_data(
+        self,
+        dim_scores: Dict[str, float],
+        dim_comments: Dict[str, str],
+        total_level: float
+    ) -> ChartData:
+        """生成完整的图表数据"""
+        # 1) 雷达图数据
+        radar_data = self._build_radar_data(dim_scores)
+        
+        # 2) 分组条形图数据
+        bar_groups = self._build_bar_groups_data(dim_scores, dim_comments, total_level)
+        
+        # 3) 优先级列表
+        priority_list = self._build_priority_list(dim_scores, total_level)
+        
+        return ChartData(
+            radar_data=radar_data,
+            bar_groups=bar_groups,
+            priority_list=priority_list
+        )
+
+    def _build_radar_data(self, dim_scores: Dict[str, float]) -> RadarChartData:
+        """生成雷达图数据"""
+        dimensions = []
+        labels = []
+        scores = []
+        
+        for dim in self.RADAR_DIMENSIONS:
+            if dim in dim_scores:
+                dimensions.append(dim)
+                labels.append(self.DIMENSION_META.get(dim, dim))
+                # 将NTRP 1.0-5.0转换为0-100
+                normalized = self._normalize_score_to_percent(dim_scores[dim])
+                scores.append(normalized)
+        
+        return RadarChartData(
+            dimensions=dimensions,
+            dimension_labels=labels,
+            scores=scores
+        )
+
+    def _build_bar_groups_data(
+        self,
+        dim_scores: Dict[str, float],
+        dim_comments: Dict[str, str],
+        total_level: float
+    ) -> List[BarChartGroup]:
+        """生成分组条形图数据"""
+        groups = []
+        
+        for group_name, group_dims in self.DIMENSION_GROUPS.items():
+            group_data = []
+            
+            for dim in group_dims:
+                if dim not in dim_scores:
+                    continue
+                    
+                score = dim_scores[dim]
+                tag = self._get_dimension_tag(score, total_level)
+                short_comment = self._first_sentence(dim_comments.get(dim, ""))
+                full_comment = dim_comments.get(dim, "")
+                
+                bar_data = DimensionBarData(
+                    dimension=dim,
+                    label=self.DIMENSION_META.get(dim, dim),
+                    score=score,
+                    normalized_score=self._normalize_score_to_percent(score),
+                    tag=tag,
+                    short_comment=short_comment,
+                    full_comment=full_comment
+                )
+                group_data.append(bar_data)
+            
+            if group_data:  # 只添加有数据的分组
+                groups.append(BarChartGroup(
+                    group_name=group_name,
+                    dimensions=group_data
+                ))
+        
+        return groups
+
+    def _build_priority_list(
+        self,
+        dim_scores: Dict[str, float],
+        total_level: float
+    ) -> List[PriorityItem]:
+        """生成训练优先级列表（取前3个最大差值）"""
+        # 计算各维度与整体水平的差值
+        gaps = []
+        for dim, score in dim_scores.items():
+            gap = total_level - score  # 差值越大越该补
+            if gap > 0:  # 只考虑低于整体水平的维度
+                gaps.append((dim, gap))
+        
+        # 按差值降序排列，取前3个
+        gaps.sort(key=lambda x: x[1], reverse=True)
+        top_gaps = gaps[:3]
+        
+        priority_items = []
+        for rank, (dim, gap) in enumerate(top_gaps, 1):
+            suggestion = self._get_training_suggestion(dim)
+            
+            priority_items.append(PriorityItem(
+                rank=rank,
+                dimension=dim,
+                label=self.DIMENSION_META.get(dim, dim),
+                gap=gap,
+                normalized_gap=min(gap * 25, 100),  # 粗略归一化到0-100
+                suggestion=suggestion
+            ))
+        
+        return priority_items
+
+    @staticmethod
+    def _normalize_score_to_percent(score: float) -> float:
+        """将NTRP分数(1.0-5.0)归一化为百分比(0-100)"""
+        # 线性映射: 1.0->0, 5.0->100
+        normalized = (score - 1.0) / (5.0 - 1.0) * 100
+        return max(0, min(100, normalized))
+
+    @staticmethod 
+    def _get_dimension_tag(score: float, total_level: float) -> DimensionTag:
+        """根据维度分数相对于整体等级的偏差，返回标签"""
+        diff = score - total_level
+        if diff >= 0.5:
+            return DimensionTag.ADVANTAGE
+        elif diff <= -0.5:
+            return DimensionTag.WEAKNESS
+        else:
+            return DimensionTag.BALANCED
+
+    def _get_training_suggestion(self, dimension: str) -> str:
+        """根据维度获取训练建议"""
+        suggestions = {
+            "baseline": "增加底线对拉练习，重点提高稳定性和深度控制",
+            "forehand": "加强正手击球练习，注意动作一致性和力量转换",
+            "backhand": "强化反手技术，可以练习单反或双反的基本动作",
+            "serve": "重点练习发球动作和准确性，建立稳定的发球节奏",
+            "return": "加强接发球练习，提高反应速度和球路预判",
+            "net": "增加网前截击和高压球练习，提高上网频率",
+            "footwork": "加强步伐和移动练习，提高场地覆盖能力",
+            "tactics": "多参与比赛和对抗，积累战术经验和心理素质",
+            "match_result": "参加更多比赛，积累实战经验",
+            "training": "增加训练频率和强度，有条件可找教练指导"
+        }
+        return suggestions.get(dimension, f"加强{self.DIMENSION_META.get(dimension, dimension)}的针对性练习")
 
 
 # =========================
