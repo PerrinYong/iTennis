@@ -172,13 +172,9 @@ class ResultDisplay:
             comment = result.dimension_comments.get(dim, "")
             
             print(f"- {dim_name}（约 {score:.1f} 级）：")
-            # 分析现状和建议
+            # 直接展示评语内容，避免重复描述
             if comment:
-                sentences = comment.split("。")
-                current_state = sentences[0] + "。" if sentences else ""
-                suggestion = self.config_manager.get_advantage_suggestion(dim)
-                print(f"  {current_state}")
-                print(f"  {suggestion}")
+                print(f"  {comment}")
             print()
     
     def _display_detailed_improvements(self, result: EvaluateResult) -> None:
@@ -195,16 +191,12 @@ class ResultDisplay:
             comment = result.dimension_comments.get(dim, "")
             
             print(f"- {dim_name}（约 {score:.1f} 级）：")
-            # 分析问题和练习建议
+            # 直接展示评语内容，避免重复描述
             if comment:
-                sentences = comment.split("。")
-                problem = sentences[0] + "。" if sentences else ""
-                suggestion = self.config_manager.get_improvement_suggestion(dim)
-                print(f"  {problem}")
-                print(f"  {suggestion}")
+                print(f"  {comment}")
             print()
         
-        print("如果你只想抓重点，建议优先在上述 2～3 个方向投入练习时间。")
+        print(self.config_manager.get_general_training_advice("focus_on_weakness"))
         print()
     
     def _display_dimension_details_expanded(self, result: EvaluateResult) -> None:
@@ -234,8 +226,8 @@ class ResultDisplay:
     
     def _display_final_suggestions(self, result: EvaluateResult) -> None:
         """显示结尾建议"""
-        print("如果你每周有 2～3 次打球时间，建议在保证正常对抗的基础上，每周抽出 1 次做'针对短板的专项练习'，例如专门练发球+第一拍、底线深度控制等。")
-        print("每隔 2～3 个月重新做一次评估，可以观察自己在各个维度上的变化趋势，也可以将本评估结果分享给教练，作为排课与训练重点的参考。")
+        print(self.config_manager.get_general_training_advice("weekly_practice"))
+        print(self.config_manager.get_general_training_advice("periodic_evaluation"))
         print()
     
     def _display_level_description(self, level: float) -> None:
@@ -358,12 +350,6 @@ class ResultDisplay:
         print("• 评估涵盖底线、发球、网前等多个技术维度")
         print("• 建议根据实际情况如实回答，以获得准确的评估结果")
         print("• 评估结果可作为选择比赛对手和训练方向的参考")
-    
-    def _display_final_suggestions(self, result: EvaluateResult) -> None:
-        """显示结尾建议"""
-        print("如果你每周有 2～3 次打球时间，建议在保证正常对抗的基础上，每周抽出 1 次做'针对短板的专项练习'，例如专门练发球+第一拍、底线深度控制等。")
-        print("每隔 2～3 个月重新做一次评估，可以观察自己在各个维度上的变化趋势，也可以将本评估结果分享给教练，作为排课与训练重点的参考。")
-        print()
         
     def display_dimension_details(self, result: EvaluateResult) -> None:
         """显示详细的维度评语（兼容旧接口）"""
@@ -371,37 +357,11 @@ class ResultDisplay:
 
     def _generate_advantage_suggestion(self, dimension: str, current_state: str) -> str:
         """生成优势维度的建议"""
-        suggestions = {
-            "baseline": "你可以多多利用底线对拉作为主要得分手段，在比赛中通过深球和变线控制比赛节奏。",
-            "forehand": "建议在比赛中多使用正手主动进攻，这是你的优势武器，可以通过正手制造得分机会。",
-            "backhand": "反手已经比较稳定，可以在比赛中更多地使用反手变线和深球来压制对手。",
-            "serve": "发球威胁较大，可以利用发球优势在比赛中控制主动权，多练习发球后第一拍的连击。",
-            "return": "接发球表现出色，可以在对手发球局中更主动地寻找机会，转守为攻。",
-            "net": "网前技术较好，建议多创造上网机会，利用网前优势结束回合。",
-            "footwork": "步法移动能力强，可以在比赛中更大胆地调动对手，利用移动优势获得有利击球位置。",
-            "tactics": "战术意识出色，继续发挥这一优势，在比赛中多观察对手弱点并制定针对性战术。",
-            "match_result": "实战成绩不错，说明比赛能力强，可以多参加更高水平的比赛来检验和提升自己。",
-            "training": "训练频率很好，这是技术持续进步的基础，可以在此基础上提高训练的针对性。"
-        }
-        
-        return suggestions.get(dimension, "这是你的优势项目，在比赛中可以多多利用。")
+        return self.config_manager.get_advantage_suggestion(dimension)
     
     def _generate_improvement_suggestion(self, dimension: str, problem: str) -> str:
         """生成改进建议"""
-        suggestions = {
-            "baseline": "建议刻意练习深球和落点变化，例如多做'对角深球 + 直线变线'的对打练习，让你的底线球既稳又有威胁。",
-            "forehand": "可以重点练习正手挥拍动作和击球时机，逐步提高正手的稳定性和威胁性。",
-            "backhand": "建议加强反手技术练习，可以从稳定的切削开始，逐步过渡到上旋反手。",
-            "serve": "可以逐步区分一发和二发，在保证二发稳定的前提下，提升一发力量和落点变化，并加入一定旋转。",
-            "return": "建议多练习对不同类型发球的接发，提高反应速度和回球质量，特别是对快速发球的处理。",
-            "net": "加强网前技术训练，特别是低球截击、反手截击和连续截击，让网前技术更全面。",
-            "footwork": "建议多练习'左右调动 + 短球/高吊'组合，让你在多变球路下仍能打出稳定回球。",
-            "tactics": "学习基本战术套路，多观察不同类型对手的弱点，逐步建立自己的比赛套路。",
-            "match_result": "多参与实战比赛，积累比赛经验，学会在压力下保持技术稳定性。",
-            "training": "增加训练频率和强度，可以制定更有针对性的训练计划，重点突破薄弱环节。"
-        }
-        
-        return suggestions.get(dimension, "建议针对这个方面制定专项训练计划，重点突破。")
+        return self.config_manager.get_improvement_suggestion(dimension)
     
     def _split_dimension_comment(self, comment: str, score: float, total_level: float) -> tuple:
         """分离维度评语为基础评语和相对评语"""

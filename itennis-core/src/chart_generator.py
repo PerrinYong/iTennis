@@ -256,28 +256,18 @@ class ChartGenerator:
         Returns:
             训练建议
         """
-        # 基础训练建议映射
-        base_suggestions = {
-            "baseline": "加强底线对拉练习，提高稳定性和深度控制",
-            "forehand": "重点练习正手挥拍动作和击球时机",
-            "backhand": "加强反手技术练习，提高稳定性和攻击力",
-            "serve": "改善发球技术，练习不同类型发球",
-            "return": "提高接发球反应速度和回球质量",
-            "net": "加强网前技术训练，练习截击和高压球",
-            "footwork": "强化步法训练，提高场上移动效率",
-            "tactics": "学习基本战术，提高比赛策略意识",
-            "match_result": "多参与实战比赛，积累比赛经验",
-            "training": "增加训练频率，保持技术进步节奏"
-        }
+        from config_manager import ConfigManager
+        config_manager = ConfigManager()
         
-        base_suggestion = base_suggestions.get(dimension, f"加强{NTRPConstants.DIMENSION_META.get(dimension, dimension)}练习")
+        # 获取基础训练建议
+        base_suggestion = config_manager.get_training_base_suggestion(dimension)
         
         # 根据差距大小添加强度提示
         if gap >= 1.0:
-            intensity = "这是急需改进的重点项目，建议每次训练都要专门练习。"
+            intensity = config_manager.get_training_intensity_text("high")
         elif gap >= 0.5:
-            intensity = "建议作为近期训练重点，适当增加练习时间。"
+            intensity = config_manager.get_training_intensity_text("medium")
         else:
-            intensity = "可以在日常训练中适当关注。"
+            intensity = config_manager.get_training_intensity_text("low")
         
         return f"{base_suggestion}。{intensity}"

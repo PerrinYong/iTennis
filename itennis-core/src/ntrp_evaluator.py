@@ -223,17 +223,8 @@ class NTRPEvaluator:
     
     def _get_base_comment(self, dimension: str, score: float) -> str:
         """根据维度和分数获取基础评语"""
-        rules = self.suggestion_rules.get(dimension, [])
-        
-        for rule in rules:
-            min_score = float(rule.get("min", -math.inf))
-            max_score = float(rule.get("max", math.inf))
-            
-            if min_score <= score < max_score:
-                return rule.get("text", "")
-        
-        # 默认评语
-        return f"在{NTRPConstants.DIMENSION_META.get(dimension, dimension)}方面，你的水平约为 NTRP {score:.1f}。"
+        # 使用dimension_suggestions.json中的内容
+        return self.config_manager.get_dimension_suggestion(dimension, score)
     
     def _get_relative_comment(self, dimension_score: float, total_level: float) -> str:
         """根据维度分数相对整体的差异生成评语"""
@@ -302,6 +293,7 @@ class NTRPEvaluator:
         
         # 训练建议
         if weaknesses:
+            # 这里可以考虑使用更个性化的建议，但目前保持简洁
             lines.append("建议在日常训练中重点针对短板项目进行专项练习，这样能更快提升整体水平。")
         
         # 鼓励语

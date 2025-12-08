@@ -140,6 +140,29 @@ class ConfigManager:
         except json.JSONDecodeError as e:
             raise ValueError(f"网球知识配置文件格式错误: {e}")
     
+    def load_dimension_suggestions(self) -> Dict[str, Any]:
+        """
+        加载维度建议配置
+        
+        Returns:
+            维度建议配置字典
+            
+        Raises:
+            FileNotFoundError: 配置文件不存在
+            ValueError: 配置文件格式错误
+        """
+        suggestion_file = self.config_dir / "dimension_suggestions.json"
+        
+        try:
+            with open(suggestion_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data
+            
+        except FileNotFoundError:
+            raise FileNotFoundError(f"维度建议配置文件不存在: {suggestion_file}")
+        except json.JSONDecodeError as e:
+            raise ValueError(f"维度建议配置文件格式错误: {e}")
+    
     def get_level_description(self, level: float) -> str:
         """
         获取等级描述
@@ -236,6 +259,40 @@ class ConfigManager:
         knowledge = self.load_tennis_knowledge()
         suggestions = knowledge.get("training_base_suggestions", {})
         return suggestions.get(dimension, f"加强{self.get_dimension_name(dimension)}训练")
+    
+    def get_dimension_suggestion(self, dimension: str, score: float) -> str:
+        """
+        根据维度和分数获取详细建议
+        
+        Args:
+            dimension: 维度名称
+            score: 分数
+            
+        Returns:
+            建议文本
+        """
+        suggestions_config = self.load_dimension_suggestions()
+        dimension_suggestions = suggestions_config.get("suggestions", {}).get(dimension, [])
+        
+        # 根据分数找到匹配的建议
+        for suggestion in dimension_suggestions:
+            min_score = suggestion.get("min")
+            max_score = suggestion.get("max")
+            
+            # 检查分数是否在范围内
+            if min_score is None and max_score is None:
+                continue
+            elif min_score is None:
+                if score <= max_score:
+                    return suggestion.get("text", "")
+            elif max_score is None:
+                if score >= min_score:
+                    return suggestion.get("text", "")
+            else:
+                if min_score <= score <= max_score:
+                    return suggestion.get("text", "")
+        
+        return f"暂无针对{self.get_dimension_name(dimension)} {score:.1f}分的具体建议。"
     
     def get_training_intensity_text(self, intensity: str) -> str:
         """
