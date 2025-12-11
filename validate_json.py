@@ -6,7 +6,7 @@ import json
 import sys
 
 try:
-    with open('itennis-core/config/questions.json', 'r', encoding='utf-8') as f:
+    with open('aiteni-core/config/questions.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
     
     questions = data.get('questions', [])

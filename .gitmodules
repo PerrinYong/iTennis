@@ -1,3 +1,3 @@
-[submodule "itennis-backend"]
-	path = itennis-backend
-	url = git@github.com:PerrinYong/itennis-backend.git
+[submodule "aiteni-backend"]
+	path = aiteni-backend
+	url = git@gitee.com:prin-y/aiteni-backend.git
