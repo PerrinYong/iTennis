@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>iTennis 爱网球训练助理 - Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --primary-blue-500: #1D7CF2;
+      --primary-blue-400: #2A8CFF;
+      --accent-yellow: #FFD84A;
+
+      --bg-body: #F5F7FA;
+      --bg-card: #FFFFFF;
+
+      --text-main: #1F2933;
+      --text-sub: #6B7280;
+      --border-soft: #E5E7EB;
+
+      --success: #16A34A;
+      --warning: #F97316;
+      --danger: #DC2626;
+      --info: #2563EB;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+        "Segoe UI", sans-serif;
+      background: var(--bg-body);
+      color: var(--text-main);
+    }
+
+    .app-shell {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: 60px auto;
+      grid-template-columns: 240px auto;
+      grid-template-areas:
+        "header header"
+        "sidebar main";
+    }
+
+    header.app-header {
+      grid-area: header;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: linear-gradient(90deg, var(--primary-blue-500), var(--primary-blue-400));
+      color: #ffffff;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: #1D7CF2;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 简化版 icon：i + 球场线 + 黄球 */
+    .logo-mark::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 6px;
+      width: 6px;
+      height: 16px;
+      border-radius: 999px;
+      background: #ffffff;
+      box-shadow: 0 14px 0 #ffffff;
+    }
+    .logo-mark::after {
+      content: "";
+      position: absolute;
+      right: 4px;
+      top: 8px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #FFD84A;
+      box-shadow: 0 14px 0 rgba(255, 216, 74, 0.5);
+    }
+    .logo-court-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 6px;
+      height: 3px;
+      background: #ffffff;
+    }
+    .logo-court-line::before {
+      content: "";
+      position: absolute;
+      left: 12px;
+      width: 3px;
+      top: -10px;
+      bottom: -4px;
+      background: #ffffff;
+    }
+
+    .app-name {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .app-subtitle {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+    }
+
+    .header-pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.24);
+      font-size: 12px;
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #BFDBFE;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1D4ED8;
+    }
+
+    aside.sidebar {
+      grid-area: sidebar;
+      background: #ffffff;
+      border-right: 1px solid var(--border-soft);
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sidebar-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sub);
+      padding: 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .nav-list {
+      list-style: none;
+      margin: 0;
+      padding: 4px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-item {
+      border-radius: 12px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--text-sub);
+    }
+
+    .nav-item span.icon {
+      width: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .nav-item.active {
+      background: rgba(29, 124, 242, 0.08);
+      color: var(--primary-blue-500);
+      position: relative;
+    }
+
+    .nav-item.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      border-radius: 999px;
+      background: var(--primary-blue-500);
+    }
+
+    main.main {
+      grid-area: main;
+      padding: 20px 24px 24px;
+      overflow: auto;
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-bottom: 20px;
+    }
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 2.1fr 1.4fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 16px 18px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .tag-chip {
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(29, 124, 242, 0.08);
+      color: var(--primary-blue-500);
+    }
+
+    .badge-level {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: #FFD84A;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1F2933;
+    }
+
+    .badge-level span.sub {
+      font-size: 12px;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+
+    .summary-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .summary-main-num {
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .summary-main-label {
+      font-size: 14px;
+      color: var(--text-sub);
+    }
+
+    .summary-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .summary-chip {
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.04);
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .summary-note {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: none;
+      background: var(--primary-blue-500);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.4);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.97);
+      background: #1557B8;
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5);
+    }
+
+    .btn-link {
+      background: none;
+      border: none;
+      padding: 0;
+      color: var(--primary-blue-500);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .list-label {
+      color: var(--text-sub);
+    }
+
+    .list-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .dot-strong {
+      background: var(--success);
+    }
+
+    .dot-weak {
+      background: var(--danger);
+    }
+
+    .dot-balance {
+      background: #9CA3AF;
+    }
+
+    .pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      color: #FFFFFF;
+    }
+
+    .pill-strong {
+      background: var(--success);
+    }
+
+    .pill-weak {
+      background: var(--danger);
+    }
+
+    .pill-balance {
+      background: #6B7280;
+    }
+
+    .card-section-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin: 0 0 8px;
+    }
+
+    .training-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .training-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.02);
+    }
+
+    .training-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .training-tag {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: rgba(22, 163, 74, 0.12);
+      color: var(--success);
+    }
+
+    .training-meta {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    /* 简易“雷达条”视觉（不是真雷达图） */
+    .skill-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .skill-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .skill-label {
+      width: 80px;
+      color: var(--text-sub);
+    }
+
+    .skill-bar {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: #E5E7EB;
+      overflow: hidden;
+    }
+
+    .skill-bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--primary-blue-500), var(--accent-yellow));
+    }
+
+    .skill-value {
+      width: 36px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+        grid-template-rows: 60px auto auto;
+        grid-template-areas:
+          "header"
+          "sidebar"
+          "main";
+      }
+      aside.sidebar {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 8px 12px;
+      }
+      .sidebar-section-title {
+        display: none;
+      }
+      .nav-list {
+        flex-direction: row;
+      }
+      .layout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- 顶部导航 -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo-mark">
+          <div class="logo-court-line"></div>
+        </div>
+        <div>
+          <div class="app-name">iTennis 爱网球训练助理</div>
+          <div class="app-subtitle">为业余选手提供专业的水平评估与训练计划</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="header-pill">
+          今日训练进度：2 / 3
+        </div>
+        <div class="avatar">Y</div>
+      </div>
+    </header>
+
+    <!-- 侧边栏导航 -->
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-section-title">导航</div>
+        <ul class="nav-list">
+          <li class="nav-item active">
+            <span class="icon">🏠</span>
+            <span>训练总览</span>
+          </li>
+          <li class="nav-item">
+            <span class="icon">🧩</span>
+            <span>评估问卷</span>
+          </li>
+          <li class="nav-item">
+            <span class="icon">📈</span>
+            <span>数据分析</span>
+          </li>
+          <li class="nav-item">
+            <span class="icon">📚</span>
+            <span>训练资源</span>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main">
+      <div class="page-title">训练总览</div>
+      <div class="page-subtitle">
+        根据最近一次评估，已为你生成今日练习建议和重点维度。
+      </div>
+
+      <div class="layout-grid">
+        <!-- 左侧：总体评估 + 技能条 -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">当前等级</div>
+            <span class="tag-chip">最近评估 · 2 天前</span>
+          </div>
+          <div class="summary-top">
+            <div>
+              <div class="summary-main-num">NTRP 3.5</div>
+              <div class="summary-main-label">发展中业余选手</div>
+            </div>
+            <div class="badge-level">
+              <span>3.5</span>
+              <span class="sub">等级徽章</span>
+            </div>
+          </div>
+
+          <div class="summary-tags">
+            <span class="summary-chip">底线多拍有一定稳定性</span>
+            <span class="summary-chip">正手可主动进攻</span>
+            <span class="summary-chip">发球威胁有提升空间</span>
+          </div>
+
+          <div class="summary-note">
+            通过近期问卷与训练记录综合评估，你已具备稳定相持和初步战术意识。
+            建议本周重点提升发球稳定性和底线防守质量。
+          </div>
+
+          <div class="skill-bars">
+            <div class="card-section-title">各维度概览</div>
+            <div class="skill-row">
+              <div class="skill-label">底线综合</div>
+              <div class="skill-bar">
+                <div class="skill-bar-fill" style="width: 68%;"></div>
+              </div>
+              <div class="skill-value">3.4</div>
+            </div>
+            <div class="skill-row">
+              <div class="skill-label">正手</div>
+              <div class="skill-bar">
+                <div class="skill-bar-fill" style="width: 75%;"></div>
+              </div>
+              <div class="skill-value">3.8</div>
+            </div>
+            <div class="skill-row">
+              <div class="skill-label">反手</div>
+              <div class="skill-bar">
+                <div class="skill-bar-fill" style="width: 62%;"></div>
+              </div>
+              <div class="skill-value">3.1</div>
+            </div>
+            <div class="skill-row">
+              <div class="skill-label">发球</div>
+              <div class="skill-bar">
+                <div class="skill-bar-fill" style="width: 55%;"></div>
+              </div>
+              <div class="skill-value">2.9</div>
+            </div>
+            <div class="skill-row">
+              <div class="skill-label">步伐覆盖</div>
+              <div class="skill-bar">
+                <div class="skill-bar-fill" style="width: 70%;"></div>
+              </div>
+              <div class="skill-value">3.5</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px; display: flex; gap: 10px; align-items: center;">
+            <button class="btn-primary">
+              查看完整评估报告
+            </button>
+            <button class="btn-link">重新评估一次</button>
+          </div>
+        </section>
+
+        <!-- 右侧：今日训练建议 + 优劣维度列表 -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">今日训练计划</div>
+            <span class="tag-chip">建议总时长约 60 分钟</span>
+          </div>
+
+          <p class="summary-note" style="margin-bottom: 12px;">
+            按照从「核心短板 → 巩固优势 → 实战应用」的顺序安排练习。
+          </p>
+
+          <h4 class="card-section-title">训练内容</h4>
+          <ul class="training-list">
+            <li class="training-item">
+              <div class="training-top">
+                <span>发球落点 + 稳定性训练</span>
+                <span class="training-tag">优先</span>
+              </div>
+              <div class="training-meta">20 分钟 · 以外角和 T 点为主，每组 10 球，统计成功率。</div>
+            </li>
+            <li class="training-item">
+              <div class="training-top">
+                <span>底线防守球相持</span>
+              </div>
+              <div class="training-meta">20 分钟 · 重点练习「被压迫时安全过渡」球，不以制胜为目标。</div>
+            </li>
+            <li class="training-item">
+              <div class="training-top">
+                <span>正手进攻套路</span>
+              </div>
+              <div class="training-meta">20 分钟 · 一发后接一拍正手进攻球，固定 1–2 套常用路线。</div>
+            </li>
+          </ul>
+
+          <h4 class="card-section-title" style="margin-top: 16px;">优势 / 短板一览</h4>
+          <ul class="list">
+            <li class="list-item">
+              <span class="list-label">正手</span>
+              <span class="list-right">
+                <span class="dot dot-strong"></span>
+                <span class="pill pill-strong">优势</span>
+              </span>
+            </li>
+            <li class="list-item">
+              <span class="list-label">发球</span>
+              <span class="list-right">
+                <span class="dot dot-weak"></span>
+                <span class="pill pill-weak">短板</span>
+              </span>
+            </li>
+            <li class="list-item">
+              <span class="list-label">底线防守</span>
+              <span class="list-right">
+                <span class="dot dot-weak"></span>
+                <span class="pill pill-weak">短板</span>
+              </span>
+            </li>
+            <li class="list-item">
+              <span class="list-label">步伐与覆盖</span>
+              <span class="list-right">
+                <span class="dot dot-balance"></span>
+                <span class="pill pill-balance">均衡</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
