@@ -57,9 +57,40 @@ Page({
    * 开始评测
    */
   startTest() {
-    wx.navigateTo({
-      url: '/pages/questionnaire/questionnaire'
-    })
+    // 检查是否有未完成的评测
+    const savedAnswers = wx.getStorageSync('current_answers');
+    const savedStage = wx.getStorageSync('current_stage');
+    
+    if (savedAnswers && Object.keys(savedAnswers).length > 0) {
+      wx.showModal({
+        title: '发现未完成的评测',
+        content: '是否继续上次的评测？',
+        confirmText: '继续',
+        cancelText: '重新开始',
+        success: (res) => {
+          if (res.confirm) {
+            // 继续上次的评测
+            wx.navigateTo({
+              url: `/pages/questionnaire/questionnaire?stage=${savedStage || 'basic'}`
+            });
+          } else {
+            // 清除保存的进度，重新开始
+            wx.removeStorageSync('current_answers');
+            wx.removeStorageSync('current_stage');
+            wx.removeStorageSync('basic_answers');
+            
+            wx.navigateTo({
+              url: '/pages/questionnaire/questionnaire?stage=basic'
+            });
+          }
+        }
+      });
+    } else {
+      // 直接开始新评测
+      wx.navigateTo({
+        url: '/pages/questionnaire/questionnaire?stage=basic'
+      });
+    }
   },
 
   /**

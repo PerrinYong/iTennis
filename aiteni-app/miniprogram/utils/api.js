@@ -4,10 +4,12 @@
  */
 
 const CONFIG = {
-  // TODO: 替换为实际的API地址
-  BASE_URL: 'https://api.aiteni.com/v1',
-  // 开发环境可以使用本地地址
-  // BASE_URL: 'http://localhost:8000/api/v1',
+  // 后端API地址
+  // 本地开发环境
+  // BASE_URL: 'http://localhost:8000/api',
+  
+  // 生产环境（已部署）
+  BASE_URL: 'http://182.92.109.59/api',
   
   TIMEOUT: 10000 // 请求超时时间（毫秒）
 }
@@ -17,6 +19,12 @@ const CONFIG = {
  */
 function request(options) {
   const { url, method = 'GET', data = {}, needAuth = true } = options
+  const fullUrl = `${CONFIG.BASE_URL}${url}`;
+  
+  console.log(`[API] 发起请求: ${method} ${fullUrl}`);
+  if (method !== 'GET' && Object.keys(data).length > 0) {
+    console.log('[API] 请求数据:', data);
+  }
 
   return new Promise((resolve, reject) => {
     // 构建请求头
@@ -33,29 +41,37 @@ function request(options) {
     }
 
     wx.request({
-      url: `${CONFIG.BASE_URL}${url}`,
+      url: fullUrl,
       method,
       data,
       header,
       timeout: CONFIG.TIMEOUT,
+      enableHttp2: false,      // 禁用HTTP2
+      enableQuic: false,        // 禁用QUIC
+      enableCache: false,       // 禁用缓存
       success: (res) => {
         const { statusCode, data } = res
+        console.log(`[API] 响应状态: ${statusCode}`);
+        console.log('[API] 响应数据:', data);
 
         // 处理HTTP状态码
         if (statusCode >= 200 && statusCode < 300) {
           // 处理业务状态码
-          if (data.code === 200) {
+          if (data.code === 0) {
+            console.log('[API] 请求成功');
             resolve(data.data)
           } else {
             // 业务错误
+            console.error('[API] 业务错误:', data.errorMsg || '未知错误');
             wx.showToast({
-              title: data.message || '操作失败',
+              title: data.errorMsg || '操作失败',
               icon: 'none'
             })
             reject(data)
           }
         } else if (statusCode === 401) {
           // 未授权，清除token并跳转到登录
+          console.warn('[API] 未授权，需要重新登录');
           wx.removeStorageSync('token')
           wx.showToast({
             title: '请重新登录',
@@ -65,6 +81,7 @@ function request(options) {
           reject(data)
         } else {
           // HTTP错误
+          console.error(`[API] HTTP错误: ${statusCode}`);
           wx.showToast({
             title: `请求失败 (${statusCode})`,
             icon: 'none'
@@ -73,7 +90,7 @@ function request(options) {
         }
       },
       fail: (err) => {
-        console.error('Request failed:', err)
+        console.error('[API] 请求失败:', err)
         wx.showToast({
           title: '网络请求失败',
           icon: 'none'
@@ -110,7 +127,7 @@ const questionnaireAPI = {
    */
   getConfig() {
     return request({
-      url: '/questionnaire/config',
+      url: '/evaluation/questions',
       method: 'GET',
       needAuth: false
     })
@@ -121,7 +138,7 @@ const questionnaireAPI = {
    */
   getDimensions() {
     return request({
-      url: '/questionnaire/dimensions',
+      url: '/evaluation/config',
       method: 'GET',
       needAuth: false
     })
@@ -133,14 +150,36 @@ const questionnaireAPI = {
  */
 const evaluationAPI = {
   /**
-   * 提交评测答案
+   * 提交基础题评测（第一阶段）
+   * @param {Object} answers - 基础题答案
+   * @returns {Promise} 包含初步等级和是否需要进阶题
    */
-  submit(answers) {
+  evaluateBasic(answers) {
     return request({
-      url: '/evaluation/submit',
+      url: '/evaluation/basic',
       method: 'POST',
       data: { answers }
     })
+  },
+
+  /**
+   * 提交完整评测（第二阶段或直接完整评测）
+   * @param {Object} answers - 所有题目答案
+   * @returns {Promise} 完整评估结果
+   */
+  evaluateFull(answers) {
+    return request({
+      url: '/evaluation/full',
+      method: 'POST',
+      data: { answers }
+    })
+  },
+
+  /**
+   * 提交评测答案（兼容旧接口）
+   */
+  submit(answers) {
+    return this.evaluateFull(answers)
   },
 
   /**

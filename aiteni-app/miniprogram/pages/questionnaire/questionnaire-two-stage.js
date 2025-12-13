@@ -5,14 +5,12 @@ Page({
   data: {
     questions: [],           // 当前阶段的问题列表
     currentIndex: 0,         // 当前问题索引
-    currentQuestion: null,   // 当前显示的问题
     answers: {},             // 当前阶段答案
     basicAnswers: {},        // 基础题答案（保存用于第二阶段）
     stage: 'basic',          // 当前阶段：'basic' 或 'advanced'
     progress: 0,             // 答题进度
     isSubmitting: false,     // 是否正在提交
-    isLoading: true,         // 是否正在加载
-    selectedAnswer: ''       // 当前选中的答案
+    isLoading: true          // 是否正在加载
   },
 
   onLoad(options) {
@@ -33,48 +31,26 @@ Page({
    * 加载题目配置
    */
   async loadQuestions() {
-    console.log('[问卷页] 开始加载题目，当前阶段:', this.data.stage);
-    
     try {
       wx.showLoading({ title: '加载题目中...' });
       
       // 从缓存获取题目配置
       let questionsConfig = wx.getStorageSync('questions_config');
-      console.log('[问卷页] 缓存中的题目配置:', questionsConfig ? '存在' : '不存在');
       
       if (!questionsConfig) {
-        console.log('[问卷页] 从服务器获取题目配置...');
         // 缓存中没有，从服务器获取
         const config = await api.questionnaire.getConfig();
-        console.log('[问卷页] 服务器返回的配置:', config);
         questionsConfig = config;
         // 缓存到本地
         wx.setStorageSync('questions_config', questionsConfig);
-        console.log('[问卷页] 题目配置已缓存');
-      }
-      
-      // 检查配置是否有效
-      if (!questionsConfig || typeof questionsConfig !== 'object') {
-        throw new Error('题目配置格式错误');
       }
       
       // 根据当前阶段筛选题目
       let filteredQuestions;
       if (this.data.stage === 'basic') {
         filteredQuestions = questionsConfig.basic_questions || [];
-        console.log('[问卷页] 基础题数量:', filteredQuestions.length);
       } else {
         filteredQuestions = questionsConfig.advanced_questions || [];
-        console.log('[问卷页] 进阶题数量:', filteredQuestions.length);
-      }
-      
-      // 打印题目详情（仅第一题）
-      if (filteredQuestions.length > 0) {
-        console.log('[问卷页] 第一题示例:', {
-          id: filteredQuestions[0].id,
-          text: filteredQuestions[0].text?.substring(0, 30) + '...',
-          optionCount: filteredQuestions[0].options?.length
-        });
       }
       
       this.setData({ 
@@ -83,59 +59,29 @@ Page({
         isLoading: false
       });
       
-      // 设置第一题
-      if (filteredQuestions.length > 0) {
-        this.updateCurrentQuestion();
-      }
-      
       wx.hideLoading();
       
       if (filteredQuestions.length === 0) {
-        console.warn('[问卷页] 警告：题目列表为空');
         wx.showModal({
-          title: '题目加载失败',
-          content: `未找到${this.data.stage === 'basic' ? '基础' : '进阶'}题目。\n\n可能原因：\n1. 服务器配置未正确设置\n2. 题目配置文件格式错误\n3. 网络连接问题`,
-          showCancel: true,
-          confirmText: '重试',
-          cancelText: '返回',
-          success: (res) => {
-            if (res.confirm) {
-              // 清除缓存后重试
-              wx.removeStorageSync('questions_config');
-              this.loadQuestions();
-            } else {
-              wx.navigateBack();
-            }
+          title: '提示',
+          content: '暂无题目',
+          showCancel: false,
+          success: () => {
+            wx.navigateBack();
           }
         });
-      } else {
-        console.log('[问卷页] 题目加载成功');
       }
       
     } catch (error) {
-      console.error('[问卷页] 加载题目失败，错误详情:', error);
-      console.error('[问卷页] 错误堆栈:', error.stack);
-      
+      console.error('加载题目失败:', error);
       wx.hideLoading();
-      
-      // 构建详细错误信息
-      let errorMsg = '题目加载失败';
-      if (error.message) {
-        errorMsg += '：' + error.message;
-      }
-      if (error.errMsg) {
-        errorMsg += '\n' + error.errMsg;
-      }
-      
       wx.showModal({
         title: '加载失败',
-        content: errorMsg + '\n\n建议：\n1. 检查网络连接\n2. 确认服务器运行正常\n3. 联系技术支持',
+        content: '题目加载失败，请重试',
         confirmText: '重试',
         cancelText: '返回',
         success: (res) => {
           if (res.confirm) {
-            // 清除缓存后重试
-            wx.removeStorageSync('questions_config');
             this.loadQuestions();
           } else {
             wx.navigateBack();
@@ -164,14 +110,10 @@ Page({
    * 选择答案
    */
   onSelectOption(e) {
-    const { optionId } = e.currentTarget.dataset;
-    const { currentQuestion, currentIndex } = this.data;
-    
-    console.log('[问卷页] 选择答案:', optionId);
+    const { questionId, optionId } = e.currentTarget.dataset;
     
     this.setData({
-      selectedAnswer: optionId,
-      [`answers.${currentQuestion.id}`]: optionId
+      [`answers.${questionId}`]: optionId
     });
     
     // 更新进度
@@ -179,26 +121,11 @@ Page({
     
     // 保存答题进度（断点续答）
     this.saveProgress();
-  },
-  
-  /**
-   * 更新当前显示的问题
-   */
-  updateCurrentQuestion() {
-    const { questions, currentIndex, answers } = this.data;
     
-    if (currentIndex >= 0 && currentIndex < questions.length) {
-      const currentQuestion = questions[currentIndex];
-      const selectedAnswer = answers[currentQuestion.id] || '';
-      
-      console.log('[问卷页] 切换到题目:', currentIndex + 1, '/', questions.length);
-      
-      this.setData({
-        currentQuestion,
-        selectedAnswer,
-        isLastQuestion: currentIndex === questions.length - 1
-      });
-    }
+    // 自动跳到下一题
+    setTimeout(() => {
+      this.onNext();
+    }, 300);
   },
 
   /**
@@ -223,12 +150,10 @@ Page({
   /**
    * 上一题
    */
-  prevQuestion() {
+  onPrevious() {
     if (this.data.currentIndex > 0) {
       this.setData({
         currentIndex: this.data.currentIndex - 1
-      }, () => {
-        this.updateCurrentQuestion();
       });
       
       // 滚动到顶部
@@ -242,11 +167,12 @@ Page({
   /**
    * 下一题
    */
-  nextQuestion() {
-    const { currentIndex, questions, selectedAnswer, isLastQuestion } = this.data;
+  onNext() {
+    const { currentIndex, questions, answers } = this.data;
+    const currentQuestion = questions[currentIndex];
     
-    // 检查是否已选择答案
-    if (!selectedAnswer) {
+    // 检查是否已回答当前题目
+    if (!answers[currentQuestion.id]) {
       wx.showToast({
         title: '请先选择答案',
         icon: 'none'
@@ -254,17 +180,17 @@ Page({
       return;
     }
     
-    // 如果是最后一题，提交
-    if (isLastQuestion) {
-      this.onSubmit();
+    // 如果是最后一题，显示提交按钮提示
+    if (currentIndex === questions.length - 1) {
+      wx.showToast({
+        title: '已完成所有题目，请点击提交',
+        icon: 'none'
+      });
       return;
     }
     
-    // 否则跳转到下一题
     this.setData({
       currentIndex: currentIndex + 1
-    }, () => {
-      this.updateCurrentQuestion();
     });
     
     // 滚动到顶部
@@ -272,13 +198,6 @@ Page({
       scrollTop: 0,
       duration: 300
     });
-  },
-  
-  /**
-   * 选择选项（兼容旧的事件名）
-   */
-  selectOption(e) {
-    this.onSelectOption(e);
   },
 
   /**
