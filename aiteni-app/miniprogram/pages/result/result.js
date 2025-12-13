@@ -87,7 +87,7 @@ Page({
    */
   loadLatestResult() {
     try {
-      const latestResult = wx.getStorageSync('latestResult')
+      const latestResult = wx.getStorageSync('latest_result')
       if (latestResult) {
         const processedResult = this.processResult(latestResult)
         this.setData({
@@ -117,48 +117,68 @@ Page({
     // TODO: 实际API调用
     await new Promise(resolve => setTimeout(resolve, 500))
     
-    return wx.getStorageSync('latestResult')
+    return wx.getStorageSync('latest_result')
   },
 
   /**
    * 处理结果数据，生成UI所需的数据结构
    */
   processResult(rawResult) {
-    // 生成优势标签
-    const advantageTags = this.generateAdvantageTags(rawResult)
+    console.log('[Result] 处理评估结果:', rawResult);
     
-    // 生成优势列表（详细）
-    const advantages = this.generateAdvantages(rawResult)
+    // 后端返回的数据结构：
+    // - total_level: 最终等级
+    // - rounded_level: 四舍五入等级
+    // - level_label: 等级标签
+    // - dimension_scores: 维度分数
+    // - dimension_comments: 维度评语
+    // - advantages: 优势列表（维度名称数组）
+    // - weaknesses: 短板列表（维度名称数组）
+    // - summary_text: 总结文本
     
-    // 生成短板列表
-    const weaknesses = this.generateWeaknesses(rawResult)
+    const overallLevel = rawResult.rounded_level || rawResult.total_level || 3.5;
+    const dimensionScores = rawResult.dimension_scores || {};
+    const dimensionComments = rawResult.dimension_comments || {};
     
-    // 生成维度详情列表
-    const dimensionDetails = this.generateDimensionDetails(rawResult)
-
-    return {
-      ...rawResult,
-      advantageTags,
-      advantages,
-      weaknesses,
-      dimensionDetails
-    }
+    // 将后端返回的优势/短板数组转换为UI需要的格式
+    const advantages = (rawResult.advantages || []).map(dim => ({
+      name: DIMENSION_NAMES[dim] || dim,
+      score: (dimensionScores[dim] || overallLevel).toFixed(1),
+      description: dimensionComments[dim] || `${DIMENSION_NAMES[dim] || dim}是您的优势项目`
+    }));
+    
+    const weaknesses = (rawResult.weaknesses || []).map(dim => ({
+      name: DIMENSION_NAMES[dim] || dim,
+      score: (dimensionScores[dim] || overallLevel).toFixed(1),
+      description: dimensionComments[dim] || `${DIMENSION_NAMES[dim] || dim}有提升空间`
+    }));
+    
+    // 直接使用后端返回的数据
+    const result = {
+      overallLevel: overallLevel,
+      levelLabel: rawResult.level_label || `NTRP ${overallLevel}`,
+      dimensions: dimensionScores,
+      dimensionComments: dimensionComments,
+      advantages: advantages,
+      weaknesses: weaknesses,
+      summaryText: rawResult.summary_text || '',
+      
+      // 为UI生成额外的数据
+      advantageTags: this.generateAdvantageTags(rawResult),
+      dimensionDetails: this.generateDimensionDetails(rawResult)
+    };
+    
+    console.log('[Result] 处理后的结果:', result);
+    return result;
   },
 
   /**
-   * 生成优势标签（简短）
+   * 生成优势标签（简短）- 基于后端返回的advantages
    */
   generateAdvantageTags(result) {
-    const { dimensions } = result
-    const entries = Object.entries(dimensions || {})
-    
-    // 排序并取前3个
-    const top3 = entries
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([key, value]) => DIMENSION_NAMES[key] || key)
-    
-    return top3
+    const advantages = result.advantages || [];
+    // 直接使用后端返回的优势维度，转换为中文名称
+    return advantages.slice(0, 3).map(dim => DIMENSION_NAMES[dim] || dim);
   },
 
   /**
@@ -204,28 +224,30 @@ Page({
   },
 
   /**
-   * 生成维度详情列表
+   * 生成维度详情列表 - 基于后端返回的dimension_scores和dimension_comments
    */
   generateDimensionDetails(result) {
-    const { dimensions, overallLevel } = result
-    const entries = Object.entries(dimensions || {})
+    const dimensions = result.dimension_scores || {};
+    const dimensionComments = result.dimension_comments || {};
+    const overallLevel = result.rounded_level || result.total_level || 3.5;
+    const entries = Object.entries(dimensions);
     
     return entries.map(([key, value], index) => {
-      const diff = value - overallLevel
-      let tagClass, tagText, subtitle
+      const diff = value - overallLevel;
+      let tagClass, tagText, subtitle;
       
       if (diff >= 0.3) {
-        tagClass = 'tag-strong'
-        tagText = '优势'
-        subtitle = '可以作为主要得分手段'
+        tagClass = 'tag-strong';
+        tagText = '优势';
+        subtitle = '可以作为主要得分手段';
       } else if (diff <= -0.3) {
-        tagClass = 'tag-weak'
-        tagText = '短板'
-        subtitle = '有提升空间'
+        tagClass = 'tag-weak';
+        tagText = '短板';
+        subtitle = '有提升空间';
       } else {
-        tagClass = 'tag-balance'
-        tagText = '均衡'
-        subtitle = '符合整体水平'
+        tagClass = 'tag-balance';
+        tagText = '均衡';
+        subtitle = '符合整体水平';
       }
       
       return {
@@ -234,10 +256,10 @@ Page({
         subtitle,
         tagClass,
         tagText,
-        detail: this.getDimensionDetail(key, value),
+        detail: dimensionComments[key] || this.getDimensionDetail(key, value),
         expanded: index === 0 // 默认展开第一个
-      }
-    })
+      };
+    });
   },
 
   /**
