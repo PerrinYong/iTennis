@@ -15,8 +15,8 @@
 /* Hero区域 */
 .hero-section {
   position: relative;
-  margin-bottom: 48rpx;
-  padding: 0 0 60rpx; /* 移除顶部padding，让标题紧贴导航栏 */
+  margin-bottom: 32rpx;
+  padding: 0 0 0rpx; /* 移除顶部padding，让标题紧贴导航栏 */
 }
 
 .hero-decoration {
@@ -50,7 +50,7 @@
 .hero-text {
   position: relative;
   z-index: 1;
-  margin-bottom: 48rpx;
+  margin-bottom: 32rpx;
 }
 
 .hero-title {
@@ -100,7 +100,7 @@
 
 /* NTRP介绍卡片 */
 .ntrp-intro {
-  margin-bottom: 24rpx;
+  margin-bottom: 20rpx;
 }
 
 .intro-header {
@@ -110,7 +110,7 @@
 .intro-content {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: 20rpx;
 }
 
 .intro-text {
@@ -173,14 +173,14 @@
 
 /* 评测说明 */
 .test-info {
-  margin-bottom: 32rpx;
+  margin-bottom: 24rpx;
 }
 
 .info-row {
   display: flex;
   align-items: center;
   gap: 20rpx;
-  padding: 20rpx 0;
+  padding: 16rpx 0;
 }
 
 .info-row + .info-row {
@@ -213,7 +213,8 @@
 
 /* 操作区域 */
 .action-area {
-  margin-top: 48rpx;
+  margin-top: 32rpx;
+  margin-bottom: 32rpx;
 }
 
 .start-btn {
@@ -221,7 +222,6 @@
   align-items: center;
   justify-content: center;
   gap: 12rpx;
-  margin-bottom: 16rpx;
 }
 
 .btn-arrow {
@@ -237,17 +237,22 @@
 .secondary-actions {
   display: flex;
   justify-content: center;
-  padding: 16rpx 0;
 }
 
 .btn-text {
   background: transparent;
   border: none;
   color: var(--primary-blue);
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: 500;
-  padding: 0;
+  padding: 24rpx 32rpx;
   display: inline-flex;
   align-items: center;
   gap: 8rpx;
+  border-radius: 12rpx;
+  transition: background-color 0.2s ease;
+}
+
+.btn-text:active {
+  background: rgba(29, 124, 242, 0.08);
 }

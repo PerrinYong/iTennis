@@ -99,12 +99,6 @@
         <text>开始评测</text>
         <text class="btn-arrow">→</text>
       </button>
-      
-      <view wx:if="{{hasHistory}}" class="secondary-actions">
-        <button class="btn-text" bindtap="viewHistory">
-          <text>查看历史记录</text>
-        </button>
-      </view>
     </view>
   </view>
 </view>
