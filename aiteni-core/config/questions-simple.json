@@ -153,7 +153,7 @@
         },
         {
           "id": "Q3_A7",
-          "text": "高节奏跑动中仍能频繁出高质量进攻/制胜分",
+          "text": "高节奏跑动中，正手仍能频繁出高质量进攻/制胜分，是突出的得分手段之一",
           "center_level": 5.5
         }
       ]
@@ -247,27 +247,27 @@
         },
         {
           "id": "Q5_A5",
-          "text": "能针对弱点发球；偶有ACE/逼出短球",
+          "text": "能通过发球主动针对对手弱点；偶有ACE或者逼出短球",
           "center_level": 4.0,
           "anchor_type": "locator"
         },
         {
           "id": "Q5_A6",
-          "text": "发球是武器：落点+旋转变化明显，对同水平有威胁",
+          "text": "发球是你重要武器：有明显的落点和旋转变化，对同水平对手构成威胁",
           "center_level": 4.5,
           "anchor_type": "baseline",
           "baseline_min_level": 4.5
         },
         {
           "id": "Q5_A7",
-          "text": "多数发球局：一发常直接得分/逼保守回球；二发也少被抢攻",
+          "text": "多数发球局：一发经常能直接得分或迫使对手打出保守回球；二发也少被抢攻。因发球被破发的情况相对较少",
           "center_level": 5.5,
           "anchor_type": "baseline",
           "baseline_min_level": 5.0
         },
         {
           "id": "Q5_A8",
-          "text": "高强度比赛：发球局很稳，一二发持续施压，很少因发球环节连丢局",
+          "text": "在强度较高的比赛中：发球局整体非常稳固，一发和二发都能持续给对手压力，很少因发球环节连丢局",
           "center_level": 6.0,
           "anchor_type": "baseline",
           "baseline_min_level": 5.5

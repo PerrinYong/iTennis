@@ -218,19 +218,32 @@ const evaluationAPI = {
    */
   getHistory(page = 1, pageSize = 10) {
     return request({
-      url: '/evaluation/history',
+      url: `/evaluation/history?page=${page}&page_size=${pageSize}`,
       method: 'GET',
-      data: { page, pageSize }
+      needAuth: true
+    })
+  },
+
+  /**
+   * 保存评测记录
+   */
+  saveEvaluation(answers, result) {
+    return request({
+      url: '/evaluation/save',
+      method: 'POST',
+      data: { answers, result },
+      needAuth: true
     })
   },
 
   /**
    * 删除评测记录
    */
-  deleteResult(resultId) {
+  deleteResult(recordId) {
     return request({
-      url: `/evaluation/result/${resultId}`,
-      method: 'DELETE'
+      url: `/evaluation/delete/${recordId}`,
+      method: 'DELETE',
+      needAuth: true
     })
   }
 }
@@ -267,7 +280,7 @@ module.exports = {
   getDimensions: questionnaireAPI.getDimensions,
   evaluateBasic: evaluationAPI.evaluateBasic,
   evaluateFull: evaluationAPI.evaluateFull,
-  getResult: evaluationAPI.getResult,
+  saveEvaluation: evaluationAPI.saveEvaluation,
   getHistory: evaluationAPI.getHistory,
   deleteResult: evaluationAPI.deleteResult
 }

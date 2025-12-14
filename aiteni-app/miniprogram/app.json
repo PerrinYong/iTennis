@@ -5,6 +5,7 @@
     "pages/questionnaire/questionnaire",
     "pages/result/result",
     "pages/history/history",
+    "pages/profile/profile",
     "pages/about/about"
   ],
   "window": {
@@ -27,6 +28,10 @@
       {
         "pagePath": "pages/history/history",
         "text": "记录"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
       },
       {
         "pagePath": "pages/about/about",
