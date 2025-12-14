@@ -6,12 +6,12 @@
 const CONFIG = {
   // 后端API地址
   // 本地开发环境
-  // BASE_URL: 'http://localhost:8000/api',
+  BASE_URL: "http://182.92.109.59/api",
   
   // 生产环境（已部署SSL证书）
-  BASE_URL: 'https://perrin-minigame.cloud/api',
+  // BASE_URL: 'https://perrin-minigame.cloud/api',
   
-  TIMEOUT: 10000 // 请求超时时间（毫秒）
+  TIMEOUT: 30000 // 请求超时时间（毫秒）- 增加到30秒，因为需要调用微信接口
 }
 
 /**
@@ -57,7 +57,7 @@ function request(options) {
         // 处理HTTP状态码
         if (statusCode >= 200 && statusCode < 300) {
           // 处理业务状态码
-          if (data.code === 0) {
+          if (data.code === 200) {
             console.log('[API] 请求成功');
             resolve(data.data)
           } else {

@@ -150,8 +150,8 @@ Page({
       console.log('[Login] 登录成功:', res);
       
       // 3. 保存Token和用户信息到本地
-      wx.setStorageSync('token', res.data.token);
-      wx.setStorageSync('userInfo', res.data.userInfo);
+      wx.setStorageSync('token', res.token);
+      wx.setStorageSync('userInfo', res.userInfo);
       
       // 4. 显示成功提示
       wx.showToast({
