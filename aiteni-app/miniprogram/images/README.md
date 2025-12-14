@@ -1,3 +1,38 @@
+# 图片资源说明
+
+## 📋 登录页面所需图片
+
+### default-avatar.png
+- **用途**：登录页面的默认头像占位图
+- **尺寸**：建议 200x200 像素或更高（保持正方形）
+- **格式**：PNG（推荐，支持透明背景）或 JPG
+- **位置**：`miniprogram/images/default-avatar.png`
+
+### 如何添加默认头像
+
+#### 方案一：使用网络图片（临时方案）
+编辑 `pages/login/login.js`，修改默认头像路径为网络URL：
+```javascript
+data: {
+  avatarUrl: 'https://your-cdn.com/default-avatar.png',
+  // ...
+}
+```
+
+#### 方案二：使用本地图片（推荐）
+1. 准备一张正方形的头像图片
+2. 重命名为 `default-avatar.png`
+3. 放置到 `miniprogram/images/` 目录
+4. 小程序会自动使用此图片
+
+#### 方案三：使用emoji（最简单）
+编辑 `pages/login/login.wxml`，直接用文字代替图片：
+```html
+<view class="avatar-placeholder">👤</view>
+```
+
+---
+
 # TabBar 图标制作指南
 
 ## 📋 需要的图标文件

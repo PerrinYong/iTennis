@@ -1,0 +1,869 @@
+{
+  "questions": [
+    {
+      "id": "Q1",
+      "dimension": "baseline",
+      "weight": 1.5,
+      "question_tier": "basic",
+      "text": "你和水平相近的球友底线**中速对拉**时（非全力爆抽），通常能**稳定连续对拉多少拍**？",
+      "options": [
+        {
+          "id": "Q1_A0",
+          "text": "刚入门：偶尔过网，**连续≤2拍**；常在**第1拍/对方一加速**就失误",
+          "center_level": 1.5,
+          "hard_cap": 2.0,
+          "anchor_type": "locator"
+        },
+        {
+          "id": "Q1_A1",
+          "text": "**连续≤3拍**；多在**1–2拍**失误（下网/出界）",
+          "center_level": 2.0,
+          "hard_cap": 2.5
+        },
+        {
+          "id": "Q1_A2",
+          "text": "偶尔到**4–6拍**；失误仍多",
+          "center_level": 2.5,
+          "hard_cap": 3.0
+        },
+        {
+          "id": "Q1_A3",
+          "text": "常见**6–10拍**；中速能稳，但**深度/方向不稳**",
+          "center_level": 3.0,
+          "anchor_type": "locator"
+        },
+        {
+          "id": "Q1_A4",
+          "text": "常见**≥10拍**；多靠**进攻/战术变化**结束回合",
+          "center_level": 3.5,
+          "anchor_type": "locator"
+        },
+        {
+          "id": "Q1_A5",
+          "text": "中速对拉**失误少**；多靠**加速/变线**决胜",
+          "center_level": 4.0,
+          "anchor_type": "locator"
+        },
+        {
+          "id": "Q1_A6",
+          "text": "接近比赛节奏多拍：**失误率低**，能**控节奏**",
+          "center_level": 4.5,
+          "anchor_type": "baseline",
+          "baseline_min_level": 4.5
+        },
+        {
+          "id": "Q1_A7",
+          "text": "快节奏深球多拍：长期**低失误**，持续用**变线/加速**造机会",
+          "center_level": 5.5,
+          "anchor_type": "baseline",
+          "baseline_min_level": 5.0
+        }
+      ]
+    },
+    {
+      "id": "Q2",
+      "dimension": "baseline",
+      "weight": 1.0,
+      "question_tier": "basic",
+      "text": "从整体看，你的底线来回球通常有多深？（以**距离底线**衡量）",
+      "options": [
+        {
+          "id": "Q2_A0",
+          "text": "多在**刚过网/发球线前**；深浅不可控，很少顶到发球线附近",
+          "center_level": 1.5
+        },
+        {
+          "id": "Q2_A1",
+          "text": "多落在**发球线附近或更短**；很难把对手顶到底线",
+          "center_level": 2.0
+        },
+        {
+          "id": "Q2_A2",
+          "text": "偶尔到**中后场（距底线约2–4m）**，但多数偏短",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q2_A3",
+          "text": "多在**中后场（距底线约1–3m）**，但深度不够稳定",
+          "center_level": 3.0
+        },
+        {
+          "id": "Q2_A4",
+          "text": "多数**中深场（距底线约1–2m）**，偶尔更深制造压力",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q2_A5",
+          "text": "能压在**底线内约0–1.5m**，对手较难主动进攻",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q2_A6",
+          "text": "深度控制好：能在**深球（底线内0–1m）**与**短球（发球线附近）**间切换",
+          "center_level": 4.5
+        },
+        {
+          "id": "Q2_A7",
+          "text": "多数回合持续压在**底线内0–1m甚至更深**，迫使对手防守/保守回球",
+          "center_level": 5.5
+        }
+      ]
+    },
+    {
+      "id": "Q3",
+      "dimension": "forehand",
+      "weight": 1.0,
+      "question_tier": "basic",
+      "text": "你的正手底线球更接近哪种状态？（看**稳定性/落点/威胁**）",
+      "options": [
+        {
+          "id": "Q3_A0",
+          "text": "适应期：常打空/打框；来球稍快就难稳定回场",
+          "center_level": 1.5
+        },
+        {
+          "id": "Q3_A1",
+          "text": "**能回场**，但动作不完整；**方向/深度随机**",
+          "center_level": 2.0
+        },
+        {
+          "id": "Q3_A2",
+          "text": "中速**勉强控方向**；**深度偏短**；偶尔“打顺了”不错",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q3_A3",
+          "text": "中速**方向较稳；能到中后场**，但**变化少/进攻一般**",
+          "center_level": 3.0
+        },
+        {
+          "id": "Q3_A4",
+          "text": "能**稳打上旋中速**；会找边线/空当；偶尔“发飘”",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q3_A5",
+          "text": "多数回合能用正手**压制对手**：控方向/深度/旋转",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q3_A6",
+          "text": "正手是**主要武器**：能主导多拍、发起进攻，偶尔一拍得分",
+          "center_level": 4.5
+        },
+        {
+          "id": "Q3_A7",
+          "text": "高节奏跑动中仍能频繁出高质量进攻/制胜分",
+          "center_level": 5.5
+        }
+      ]
+    },
+    {
+      "id": "Q4",
+      "dimension": "backhand",
+      "weight": 1.0,
+      "question_tier": "basic",
+      "text": "你最典型的反手底线表现是？（看**敢不敢出手/稳定性/质量**）",
+      "options": [
+        {
+          "id": "Q4_A0",
+          "text": "几乎不用反手；来球到反手侧常躲/直接失误",
+          "center_level": 1.5,
+          "hard_cap": 2.5
+        },
+        {
+          "id": "Q4_A1",
+          "text": "不太敢用反手；多绕正手，反手出手没底",
+          "center_level": 2.0,
+          "hard_cap": 3.0
+        },
+        {
+          "id": "Q4_A2",
+          "text": "能勉强挡回，但常**短/飘/没方向**",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q4_A3",
+          "text": "中速能稳定回场；有一定方向，但**深度一般**",
+          "center_level": 3.0
+        },
+        {
+          "id": "Q4_A4",
+          "text": "能中速对拉；方向不错，但**高球/快球吃力**",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q4_A5",
+          "text": "能打上旋或切削变化；有时可主动进攻",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q4_A6",
+          "text": "反手不再是短板；多数情况下能打出有质量的主动球",
+          "center_level": 4.5
+        },
+        {
+          "id": "Q4_A7",
+          "text": "快节奏对抗中反手仍稳且有质量；能用深球/变线/制胜分造威胁",
+          "center_level": 5.5
+        }
+      ]
+    },
+    {
+      "id": "Q5",
+      "dimension": "serve",
+      "weight": 1.5,
+      "question_tier": "basic",
+      "text": "在比赛中，你的发球整体**稳定性（双误/进球率）**最接近哪种？",
+      "options": [
+        {
+          "id": "Q5_A0",
+          "text": "动作未熟：常发不到发球区；偶尔进也不稳定",
+          "center_level": 1.5,
+          "hard_cap": 2.5
+        },
+        {
+          "id": "Q5_A1",
+          "text": "双误多：**每局约2–3个**很常见，有时甚至发不进",
+          "center_level": 2.0,
+          "hard_cap": 3.0
+        },
+        {
+          "id": "Q5_A2",
+          "text": "大多能发进；速度慢/落点随机，主要是“发进去开分”",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q5_A3",
+          "text": "一发偶有力量但常出界；二发较慢但较稳",
+          "center_level": 3.0,
+          "anchor_type": "locator"
+        },
+        {
+          "id": "Q5_A4",
+          "text": "一发有攻击性；二发落点较稳；不太担心双误",
+          "center_level": 3.5,
+          "anchor_type": "locator"
+        },
+        {
+          "id": "Q5_A5",
+          "text": "能针对弱点发球；偶有ACE/逼出短球",
+          "center_level": 4.0,
+          "anchor_type": "locator"
+        },
+        {
+          "id": "Q5_A6",
+          "text": "发球是武器：落点+旋转变化明显，对同水平有威胁",
+          "center_level": 4.5,
+          "anchor_type": "baseline",
+          "baseline_min_level": 4.5
+        },
+        {
+          "id": "Q5_A7",
+          "text": "多数发球局：一发常直接得分/逼保守回球；二发也少被抢攻",
+          "center_level": 5.5,
+          "anchor_type": "baseline",
+          "baseline_min_level": 5.0
+        },
+        {
+          "id": "Q5_A8",
+          "text": "高强度比赛：发球局很稳，一二发持续施压，很少因发球环节连丢局",
+          "center_level": 6.0,
+          "anchor_type": "baseline",
+          "baseline_min_level": 5.5
+        }
+      ]
+    },
+    {
+      "id": "Q6",
+      "dimension": "serve",
+      "weight": 1.0,
+      "question_tier": "basic",
+      "text": "不只看“发得进”，你的发球在**威胁性/变化（速度/旋转/落点）**上更像哪种？",
+      "options": [
+        {
+          "id": "Q6_A1",
+          "text": "只求发进；不太敢发力/变化，很少给对手压力",
+          "center_level": 2.0
+        },
+        {
+          "id": "Q6_A2",
+          "text": "偶尔尝试大力，但成功率低；多数时候偏保守",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q6_A3",
+          "text": "一发有时明显更快，对方会觉得有点吃紧",
+          "center_level": 3.0
+        },
+        {
+          "id": "Q6_A4",
+          "text": "能有意识发到弱点区域；偶尔ACE/直接造成弱回球",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q6_A5",
+          "text": "能用**速度+旋转+落点**组合变化，经常为后续进攻造机会",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q6_A6",
+          "text": "发球是明确武器；经常直接得分或形成压制",
+          "center_level": 4.5
+        },
+        {
+          "id": "Q6_A7",
+          "text": "能计划性运用**不同旋转+落点**，整场持续限制对手接发选择和站位",
+          "center_level": 5.5
+        }
+      ]
+    },
+    {
+      "id": "Q7",
+      "dimension": "return",
+      "weight": 1.0,
+      "question_tier": "basic",
+      "text": "面对同水平对手的发球，你的接发通常是？（看**碰球率/回球质量**）",
+      "options": [
+        {
+          "id": "Q7_A0",
+          "text": "对方稍快/有角度就难碰到球，很多球直接接不到",
+          "center_level": 1.5
+        },
+        {
+          "id": "Q7_A1",
+          "text": "发球稍快就慌；很多球下网或打飞",
+          "center_level": 2.0
+        },
+        {
+          "id": "Q7_A2",
+          "text": "慢球能接进；中速很吃力，多数只能“挡回去”",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q7_A3",
+          "text": "中速能稳定接进并控方向；对明显大力一发较被动",
+          "center_level": 3.0
+        },
+        {
+          "id": "Q7_A4",
+          "text": "能接好大多数发球；可主动打弱点/制造高球或短球",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q7_A5",
+          "text": "对方二发偏软会很难受：你接发经常直接给压力",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q7_A6",
+          "text": "接发可作为抢攻得分点，经常**1–2拍**内结束回合",
+          "center_level": 4.5
+        },
+        {
+          "id": "Q7_A7",
+          "text": "面对好速度+好落点仍能稳定回出深球/角度球，发球方难靠发球直接掌控主动",
+          "center_level": 5.5
+        }
+      ]
+    },
+    {
+      "id": "Q8",
+      "dimension": "net",
+      "weight": 1.0,
+      "question_tier": "basic",
+      "text": "你对“主动上网 + 截击/高压”的把握是？（看**成功率/信心**）",
+      "options": [
+        {
+          "id": "Q8_A0",
+          "text": "几乎没网前经验；上网后易站位不当或漏球",
+          "center_level": 1.5
+        },
+        {
+          "id": "Q8_A1",
+          "text": "基本不主动上网；网前很不踏实，宁愿留底线",
+          "center_level": 2.0
+        },
+        {
+          "id": "Q8_A2",
+          "text": "偶尔被动到网前；多是挡回去，反手截击几乎不会",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q8_A3",
+          "text": "正手截击较稳；反手截击易失误；高压偶尔能打好",
+          "center_level": 3.0
+        },
+        {
+          "id": "Q8_A4",
+          "text": "上网意识增强；步伐还行；能完成多数正手截击和常规高压",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q8_A5",
+          "text": "能随球上网，并通过**1–2拍**截击/高压结束这一分",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q8_A6",
+          "text": "网前是得分手段之一：反手截击/低球截击/高压都很有把握",
+          "center_level": 4.5
+        },
+        {
+          "id": "Q8_A7",
+          "text": "选择上网后成功率高，常用**2–3拍**网前处理结束分数；对手难靠穿越稳定得分",
+          "center_level": 5.5
+        }
+      ]
+    },
+    {
+      "id": "Q9",
+      "dimension": "footwork",
+      "weight": 1.0,
+      "question_tier": "basic",
+      "text": "被拉到两边 + 突然短球/高吊时，你的**移动到位率/恢复速度**更接近哪种？",
+      "options": [
+        {
+          "id": "Q9_A0",
+          "text": "对手一拉开角度或一变线，我常来不及移动，只能勉强够球/看球落地",
+          "center_level": 1.5
+        },
+        {
+          "id": "Q9_A1",
+          "text": "对手多调动几次就跑不到位，常被空场或放小/高吊打死",
+          "center_level": 2.0
+        },
+        {
+          "id": "Q9_A2",
+          "text": "侧向移动还行，但对突然短球/高吊跟不上节奏",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q9_A3",
+          "text": "能覆盖大部分底线；短球有时赶得上，高吊多数能退回去",
+          "center_level": 3.0
+        },
+        {
+          "id": "Q9_A4",
+          "text": "覆盖能力不错；连续跑动后仍能打出稳定回球",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q9_A5",
+          "text": "即使对手刻意调动，也能用步伐调整保持良好击球点",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q9_A6",
+          "text": "长回合体能和步伐仍在线，很少因跑不到而直接丢分",
+          "center_level": 4.5
+        },
+        {
+          "id": "Q9_A7",
+          "text": "高强度多拍中多次被调动仍能快速到位并恢复站位，防守后也常能抓到反攻机会",
+          "center_level": 5.5
+        }
+      ]
+    },
+    {
+      "id": "Q10",
+      "dimension": "tactics",
+      "weight": 1.0,
+      "question_tier": "basic",
+      "text": "在比赛中，你更像下面哪一种？（看**战术选择/执行/心态**）",
+      "options": [
+        {
+          "id": "Q10_A0",
+          "text": "很少打完整计分对抗；对战术/线路几乎没概念",
+          "center_level": 1.5
+        },
+        {
+          "id": "Q10_A1",
+          "text": "主要就是把球回去；很少想“打哪/怎么打”",
+          "center_level": 2.0
+        },
+        {
+          "id": "Q10_A2",
+          "text": "偶尔想到“多打反手”，但执行不稳定",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q10_A3",
+          "text": "会针对弱点用深度/角度，但情绪/比分一紧就容易崩失误",
+          "center_level": 3.0
+        },
+        {
+          "id": "Q10_A4",
+          "text": "能按计划打弱点，并用挑高/放小/上网等改变节奏",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q10_A5",
+          "text": "能随比分/对手风格调整打法；关键分执行更坚决",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q10_A6",
+          "text": "很少“输给自己”；多数是对方整体更强导致输球",
+          "center_level": 4.5
+        },
+        {
+          "id": "Q10_A7",
+          "text": "胶着局面能通过发球落点/进攻路线/上网频率等逐步把比赛带入自己更稳的节奏",
+          "center_level": 5.5
+        }
+      ]
+    },
+    {
+      "id": "Q11",
+      "dimension": "match_result",
+      "weight": 1.5,
+      "question_tier": "basic",
+      "text": "你常参加的单打比赛中，一盘**6局制**的典型比分更接近哪种？",
+      "options": [
+        {
+          "id": "Q11_A0",
+          "text": "几乎没打过完整6局制单打，暂无可参考比分",
+          "center_level": 1.5,
+          "hard_cap": 2.5
+        },
+        {
+          "id": "Q11_A1",
+          "text": "对稍强对手：通常拿不到**2局**（**0:6/1:6**更常见）",
+          "center_level": 2.5,
+          "hard_cap": 3.0
+        },
+        {
+          "id": "Q11_A2",
+          "text": "对稍强对手：偶尔拿到**2–3局**（**2:6/3:6**），很少胶着",
+          "center_level": 3.0,
+          "anchor_type": "locator"
+        },
+        {
+          "id": "Q11_A3",
+          "text": "对相近或稍强：常见**3:6/4:6**，能拉锯",
+          "center_level": 3.5,
+          "anchor_type": "locator"
+        },
+        {
+          "id": "Q11_A5",
+          "text": "对同水平或略弱：通常能赢（**6:3**及以上更常见）",
+          "center_level": 4.5,
+          "anchor_type": "baseline",
+          "baseline_min_level": 4.5
+        },
+        {
+          "id": "Q11_A6",
+          "text": "常参加的比赛里，多数对手要发挥很好才有机会赢你；淘汰赛胜率也较好",
+          "center_level": 5.0,
+          "anchor_type": "baseline",
+          "baseline_min_level": 5.0
+        },
+        {
+          "id": "Q11_A7",
+          "text": "业余/公开赛事中多次打进后几轮（如八强/四强/决赛），面对强手也常能取胜",
+          "center_level": 6.0,
+          "anchor_type": "baseline",
+          "baseline_min_level": 5.5
+        }
+      ]
+    },
+    {
+      "id": "Q12",
+      "dimension": "training",
+      "weight": 0.5,
+      "question_tier": "basic",
+      "text": "过去**12个月**里，你的训练背景和打球频率更接近哪种？（看**每周次数**）",
+      "options": [
+        {
+          "id": "Q12_A0",
+          "text": "刚接触不久；过去一年打得很少（零散体验）",
+          "center_level": 1.5
+        },
+        {
+          "id": "Q12_A1",
+          "text": "纯业余自玩；过去一年不多且不固定（时断时续）",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q12_A2",
+          "text": "约**每周1次**；主要和朋友打，训练不系统",
+          "center_level": 3.0
+        },
+        {
+          "id": "Q12_A3",
+          "text": "约**每周2次**；偶尔上课或做专项练习",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q12_A4",
+          "text": "**每周3次+**；有规律对抗/练习安排",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q12_A5",
+          "text": "曾在校队/俱乐部青训等体系系统训练（即使现在不高频）",
+          "center_level": 5.0
+        },
+        {
+          "id": "Q12_A6",
+          "text": "曾在市队/省队等专业体系长期训练，或多次参加国家级以上比赛",
+          "center_level": 6.0
+        }
+      ]
+    },
+    {
+      "id": "Q13",
+      "dimension": "forehand",
+      "weight": 0.7,
+      "question_tier": "advanced",
+      "text": "在被调动、需要**跑动击球**时，你的正手表现更接近哪种？",
+      "options": [
+        {
+          "id": "Q13_A2",
+          "text": "步伐赶得上能回场，但质量一般，常回中场/短球",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q13_A3",
+          "text": "多数情况下能边跑边稳定还击，偶尔还能打出有威胁的斜线/直线",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q13_A4",
+          "text": "被调动中仍能保持质量与主动，常借力或变线给压力",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q13_A5",
+          "text": "大角度跑动中也常能打直线穿越/高质量进攻，把被动转主动",
+          "center_level": 5.0
+        },
+        {
+          "id": "Q13_A6",
+          "text": "高强度比赛里跑动正手质量接近原地击球，极限跑动后仍能出制胜分/强攻球",
+          "center_level": 6.0
+        }
+      ]
+    },
+    {
+      "id": "Q14",
+      "dimension": "backhand",
+      "weight": 0.7,
+      "question_tier": "advanced",
+      "text": "一般底线对拉中，你的反手更常出现哪种情况？（看**保守/顶住/主动**）",
+      "options": [
+        {
+          "id": "Q14_A2",
+          "text": "能慢速吊回去，但方向/深度偏保守，更多是“先活着”",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q14_A3",
+          "text": "中速节奏能较稳顶住来球，偶尔能压制对手反手",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q14_A4",
+          "text": "反手较可靠：能主动变线、下压并制造进攻机会",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q14_A5",
+          "text": "相持中反手稳定且穿透好，能靠变线/下压为自己造得分机会",
+          "center_level": 5.0
+        },
+        {
+          "id": "Q14_A6",
+          "text": "高强度比赛中能按来球选择上旋/切削：既能稳相持，也能靠反手主动进攻得分",
+          "center_level": 6.0
+        }
+      ]
+    },
+    {
+      "id": "Q15",
+      "dimension": "return",
+      "weight": 0.7,
+      "question_tier": "advanced",
+      "text": "面对对手的发球，你的接发策略通常是？（看**回球深度/目标线路/主动性**）",
+      "options": [
+        {
+          "id": "Q15_A1",
+          "text": "经常接不到或直接失误，只能指望对手发球失误",
+          "center_level": 2.0
+        },
+        {
+          "id": "Q15_A2",
+          "text": "多数能碰到拍，但球常**高且短**或方向随机，给对手很多机会",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q15_A3",
+          "text": "多数能稳回到中后场，偶尔能压向对手相对弱的一侧",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q15_A4",
+          "text": "能按落点/旋转选线路，把接发变成主动抢攻或压制",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q15_A5",
+          "text": "面对更强发球也能借力打力，常回深球/角度球压制；接发是优势",
+          "center_level": 5.0
+        },
+        {
+          "id": "Q15_A6",
+          "text": "高强度比赛里常用主动接发抢攻争取破发；对手需调整发球战术才能降威胁",
+          "center_level": 6.0
+        }
+      ]
+    },
+    {
+      "id": "Q16",
+      "dimension": "net",
+      "weight": 0.7,
+      "question_tier": "advanced",
+      "text": "当你打出一拍质量不错的进攻球后，你上网结束这一分的**把握/成功率**如何？",
+      "options": [
+        {
+          "id": "Q16_A2",
+          "text": "会尝试上网，但反应偏慢；截击/高压成功率一般，常要多拍才结束",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q16_A3",
+          "text": "有机会会前压；上网后常用**1–2拍**截击/高压结束，失误率可接受",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q16_A4",
+          "text": "能读懂来球路线与节奏，常用“一拍进攻+上网”组合在几拍内结束",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q16_A5",
+          "text": "上网后站位选择好，靠多样截击（短/深角等）保持较高网前得分率",
+          "center_level": 5.0
+        },
+        {
+          "id": "Q16_A6",
+          "text": "高节奏比赛里判断前压时机准；上网后截击/高压成功率高，常用“进攻+上网”直接结束",
+          "center_level": 6.0
+        }
+      ]
+    },
+    {
+      "id": "Q17",
+      "dimension": "footwork",
+      "weight": 0.7,
+      "question_tier": "advanced",
+      "text": "不看纯体能，你在击球前**调整步伐、找到合适击球点**的能力更接近哪种？",
+      "options": [
+        {
+          "id": "Q17_A2",
+          "text": "球速不快能小步到位；节奏一快就跟不上，击球点容易变形",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q17_A3",
+          "text": "多数来球能用分解步到合适击球点，只有极端球路才明显被动",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q17_A4",
+          "text": "有“打完就恢复”习惯；步伐节奏清晰，能主动选理想击球点展开攻防",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q17_A5",
+          "text": "快节奏来回中多数来球能提前启动并小步到位，很少因站位被迫只能防守回球",
+          "center_level": 5.0
+        },
+        {
+          "id": "Q17_A6",
+          "text": "高强度比赛里对手加速/加变化仍能保持流畅步伐与良好击球点，姿态稳定",
+          "center_level": 6.0
+        }
+      ]
+    },
+    {
+      "id": "Q18",
+      "dimension": "tactics",
+      "weight": 0.7,
+      "question_tier": "advanced",
+      "text": "在比赛中，你对战术的**执行与调整**能力如何？",
+      "options": [
+        {
+          "id": "Q18_A1",
+          "text": "基本按自己习惯打，很少注意对手弱点",
+          "center_level": 2.0
+        },
+        {
+          "id": "Q18_A2",
+          "text": "能看出对手偏防守/偏进攻，但具体怎么针对经常想不清",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q18_A3",
+          "text": "能逐渐找到明显弱点（如反手/移动），并有意识多打那个区域",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q18_A4",
+          "text": "能针对弱点制定简单计划，并随比分/状态微调策略",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q18_A5",
+          "text": "同类对手反复交手时能基于经验主动调整战术，保持较高胜率",
+          "center_level": 5.0
+        },
+        {
+          "id": "Q18_A6",
+          "text": "落后或被动时能通过变节奏/线路/上网比例等多次扭转走势，关键场次靠策略拉开差距",
+          "center_level": 6.0
+        }
+      ]
+    },
+    {
+      "id": "Q19",
+      "dimension": "match_result",
+      "weight": 0.7,
+      "question_tier": "advanced",
+      "text": "你常参加的比赛级别与对手水平更接近哪种？（看**圈层/胜率**）",
+      "options": [
+        {
+          "id": "Q19_A1",
+          "text": "以友谊赛/娱乐约球为主；对同圈层多数对手**输多赢少**",
+          "center_level": 2.5
+        },
+        {
+          "id": "Q19_A2",
+          "text": "固定圈子里和多数对手**五五开**；对更强对手偶尔能爆冷赢一场",
+          "center_level": 3.0
+        },
+        {
+          "id": "Q19_A3",
+          "text": "固定圈子里多数时候略占优势，胶着比分中更常拿下关键分",
+          "center_level": 3.5
+        },
+        {
+          "id": "Q19_A4",
+          "text": "常规对手中整体偏强，能控制比赛走势；需要刻意找更强对手才有挑战",
+          "center_level": 4.0
+        },
+        {
+          "id": "Q19_A5",
+          "text": "常参加俱乐部联赛/城市级业余赛，在强圈子里也有稳定竞争力与胜场",
+          "center_level": 5.0
+        },
+        {
+          "id": "Q19_A6",
+          "text": "多参加高水平奖金赛/公开赛，常能在签表走得较远，对多数对手都有取胜机会",
+          "center_level": 6.0
+        }
+      ]
+    }
+  ]
+}

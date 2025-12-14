@@ -8,8 +8,8 @@ const CONFIG = {
   // 本地开发环境
   // BASE_URL: 'http://localhost:8000/api',
   
-  // 生产环境（已部署）
-  BASE_URL: 'http://182.92.109.59/api',
+  // 生产环境（已部署SSL证书）
+  BASE_URL: 'https://perrin-minigame.cloud/api',
   
   TIMEOUT: 10000 // 请求超时时间（毫秒）
 }
@@ -107,13 +107,25 @@ function request(options) {
 const authAPI = {
   /**
    * 微信登录
+   * @param {Object} data - 登录数据 {code, avatarUrl, nickName}
    */
-  wxLogin(code) {
+  wxLogin(data) {
     return request({
-      url: '/auth/wx-login',
+      url: '/auth/login',
       method: 'POST',
-      data: { code },
+      data: data,
       needAuth: false
+    })
+  },
+
+  /**
+   * 验证Token
+   */
+  verifyToken() {
+    return request({
+      url: '/auth/verify',
+      method: 'POST',
+      needAuth: true
     })
   }
 }
@@ -240,8 +252,22 @@ const trainingAPI = {
 
 // 导出所有API
 module.exports = {
+  // 认证相关
+  wechatLogin: authAPI.wxLogin,
+  verifyToken: authAPI.verifyToken,
+  
+  // 问卷和评估相关（保持向后兼容）
   auth: authAPI,
   questionnaire: questionnaireAPI,
   evaluation: evaluationAPI,
-  training: trainingAPI
+  training: trainingAPI,
+  
+  // 直接导出评估方法（简化调用）
+  getQuestions: questionnaireAPI.getConfig,
+  getDimensions: questionnaireAPI.getDimensions,
+  evaluateBasic: evaluationAPI.evaluateBasic,
+  evaluateFull: evaluationAPI.evaluateFull,
+  getResult: evaluationAPI.getResult,
+  getHistory: evaluationAPI.getHistory,
+  deleteResult: evaluationAPI.deleteResult
 }

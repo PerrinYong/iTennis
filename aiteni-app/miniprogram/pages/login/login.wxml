@@ -1,0 +1,61 @@
+<!--pages/login/login.wxml-->
+<view class="login-container">
+  <!-- Logo和标题 -->
+  <view class="header">
+    <view class="app-logo">🎾</view>
+    <view class="app-name">爱特尼网球评测</view>
+    <view class="app-desc">欢迎使用网球水平评估系统</view>
+  </view>
+
+  <!-- 登录表单（使用微信官方推荐的头像昵称填写能力） -->
+  <view class="login-form">
+    <!-- 头像选择（微信官方推荐方式：open-type="chooseAvatar"） -->
+    <view class="form-item">
+      <view class="form-label">选择头像</view>
+      <button 
+        class="avatar-wrapper" 
+        open-type="chooseAvatar" 
+        bind:chooseavatar="onChooseAvatar"
+      >
+        <image class="avatar" src="{{avatarUrl}}" mode="aspectFill"></image>
+        <view class="avatar-tip">点击选择头像</view>
+      </button>
+    </view>
+    
+    <!-- 昵称输入（微信官方推荐方式：type="nickname"） -->
+    <view class="form-item">
+      <view class="form-label">输入昵称</view>
+      <view class="nickname-wrapper">
+        <input 
+          type="nickname" 
+          class="nickname-input" 
+          placeholder="请输入昵称" 
+          placeholder-class="placeholder"
+          value="{{nickName}}"
+          bindinput="onNicknameInput"
+          bindblur="onNicknameBlur"
+          maxlength="20"
+        />
+      </view>
+      <view class="nickname-hint">输入框上方会显示微信昵称</view>
+    </view>
+    
+    <!-- 登录按钮 -->
+    <button 
+      class="login-btn {{isLoading ? 'disabled' : ''}}" 
+      bindtap="wxLogin"
+      disabled="{{isLoading}}"
+    >
+      <text wx:if="{{!isLoading}}">微信一键登录</text>
+      <text wx:else>登录中...</text>
+    </button>
+  </view>
+
+  <!-- 用户协议 -->
+  <view class="agreement">
+    <text class="agreement-text">登录即代表同意</text>
+    <text class="agreement-link">《用户协议》</text>
+    <text class="agreement-text">和</text>
+    <text class="agreement-link">《隐私政策》</text>
+  </view>
+</view>

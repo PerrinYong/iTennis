@@ -1,12 +1,15 @@
 // app.js
+const api = require('./utils/api.js');
+
 App({
   globalData: {
     userInfo: null,
-    openId: null,
+    token: null,
     hasLogin: false
   },
 
   onLaunch: function () {
+    console.log('[App] 小程序启动');
     // 检查登录状态
     this.checkLoginStatus();
   },
@@ -16,75 +19,69 @@ App({
    */
   checkLoginStatus() {
     try {
+      const token = wx.getStorageSync('token');
       const userInfo = wx.getStorageSync('userInfo');
-      const openId = wx.getStorageSync('openId');
-      if (userInfo && openId) {
+      
+      if (token && userInfo) {
+        console.log('[App] 检测到本地Token，验证有效性');
+        this.globalData.token = token;
         this.globalData.userInfo = userInfo;
-        this.globalData.openId = openId;
         this.globalData.hasLogin = true;
+        
+        // 可选：验证Token是否仍然有效
+        api.verifyToken().then(() => {
+          console.log('[App] Token验证成功');
+        }).catch(() => {
+          console.log('[App] Token已失效，清除本地数据');
+          this.logout();
+        });
+      } else {
+        console.log('[App] 未检测到登录信息');
+        this.globalData.hasLogin = false;
       }
     } catch (e) {
-      console.error('检查登录状态失败:', e);
+      console.error('[App] 检查登录状态失败:', e);
     }
   },
 
   /**
-   * 微信登录
+   * 检查是否需要登录
+   * @returns {Boolean} 是否已登录
    */
-  login() {
-    return new Promise((resolve, reject) => {
-      wx.login({
+  checkNeedLogin() {
+    const token = wx.getStorageSync('token');
+    if (!token) {
+      wx.showModal({
+        title: '需要登录',
+        content: '请先登录后再使用',
+        confirmText: '去登录',
         success: (res) => {
-          if (res.code) {
-            // 发送 res.code 到后台换取 openId, sessionKey, unionId
-            console.log('登录成功，code:', res.code);
-            // TODO: 调用后端API换取openId
-            // 这里暂时使用本地存储模拟
-            this.globalData.hasLogin = true;
-            resolve(res.code);
-          } else {
-            console.error('登录失败！', res.errMsg);
-            reject(res.errMsg);
+          if (res.confirm) {
+            wx.redirectTo({
+              url: '/pages/login/login'
+            });
           }
-        },
-        fail: (err) => {
-          console.error('wx.login调用失败:', err);
-          reject(err);
         }
       });
-    });
-  },
-
-  /**
-   * 获取用户信息
-   */
-  getUserInfo() {
-    return new Promise((resolve, reject) => {
-      wx.getUserProfile({
-        desc: '用于完善用户资料',
-        success: (res) => {
-          console.log('获取用户信息成功:', res.userInfo);
-          this.globalData.userInfo = res.userInfo;
-          // 保存到本地
-          wx.setStorageSync('userInfo', res.userInfo);
-          resolve(res.userInfo);
-        },
-        fail: (err) => {
-          console.error('获取用户信息失败:', err);
-          reject(err);
-        }
-      });
-    });
+      return false;
+    }
+    return true;
   },
 
   /**
    * 退出登录
    */
   logout() {
+    console.log('[App] 用户退出登录');
     this.globalData.userInfo = null;
-    this.globalData.openId = null;
+    this.globalData.token = null;
     this.globalData.hasLogin = false;
     wx.removeStorageSync('userInfo');
-    wx.removeStorageSync('openId');
+    wx.removeStorageSync('token');
+    
+    // 跳转到登录页
+    wx.redirectTo({
+      url: '/pages/login/login'
+    });
   }
 });
