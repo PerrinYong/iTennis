@@ -176,13 +176,15 @@ const evaluationAPI = {
    * 提交基础题评测（第一阶段）
    * @param {Object} answers - 基础题答案
    * @returns {Promise} 包含初步等级和是否需要进阶题
+   * 
+   * 注意：needAuth: true 以便后端识别登录状态并自动保存记录
    */
   evaluateBasic(answers) {
     return request({
       url: '/evaluation/basic',
       method: 'POST',
       data: { answers },
-      needAuth: false
+      needAuth: true  // ✅ 改为 true，携带 Token 以便后端自动保存
     })
   },
 
@@ -190,13 +192,15 @@ const evaluationAPI = {
    * 提交完整评测（第二阶段或直接完整评测）
    * @param {Object} answers - 所有题目答案
    * @returns {Promise} 完整评估结果
+   * 
+   * 注意：needAuth: true 以便后端识别登录状态并自动保存记录
    */
   evaluateFull(answers) {
     return request({
       url: '/evaluation/full',
       method: 'POST',
       data: { answers },
-      needAuth: false
+      needAuth: true  // ✅ 改为 true，携带 Token 以便后端自动保存
     })
   },
 
