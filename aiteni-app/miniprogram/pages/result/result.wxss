@@ -5,6 +5,7 @@
   min-height: 100vh;
   background: var(--bg-gray);
   box-sizing: border-box;
+  position: relative; /* 让底部栏使用 absolute 时能稳定贴底 */
 }
 
 /* 加载状态 */
@@ -90,9 +91,76 @@
   gap: 12rpx;
 }
 
-.chip-blue {
+.chip-hero {
   background: rgba(255, 255, 255, 0.18);
   color: #EFF6FF;
+}
+
+/* Bottom Bar */
+.bottom-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  background: #FFFFFF;
+  padding: 20rpx 32rpx;
+  padding-bottom: calc(20rpx + constant(safe-area-inset-bottom)); /* 兼容 iOS < 11.2 */
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom)); /* 兼容 iOS >= 11.2 */
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  z-index: 999;
+  box-sizing: border-box;
+}
+
+.bottom-spacer {
+  height: 120rpx;
+  height: calc(120rpx + constant(safe-area-inset-bottom));
+  height: calc(120rpx + env(safe-area-inset-bottom));
+  width: 100%;
+}
+
+.btn-bottom {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 999rpx;
+  background: #F3F4F6;
+  color: var(--text-main);
+  border: 2rpx solid #E5E7EB;
+  font-size: 28rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.btn-bottom-icon {
+  font-size: 34rpx;
+  line-height: 1;
+}
+
+.btn-bottom-text {
+  line-height: 1;
+}
+
+.btn-bottom--primary {
+  background: var(--primary-blue);
+  color: #FFFFFF;
+  border-color: var(--primary-blue);
+  box-shadow: 0 8rpx 20rpx rgba(37, 99, 235, 0.25);
+}
+
+.btn-bottom:active {
+  transform: scale(0.98);
+}
+
+.btn-bottom--primary:active {
+  background: var(--primary-blue-soft);
 }
 
 .summary-note {
@@ -228,7 +296,8 @@
 }
 
 .list-icon-adv {
-  background: rgba(31, 162, 122, 0.08);
+  background: rgba(31, 162, 122, 0.15);
+  color: var(--primary-green);
 }
 
 .list-icon-weak {

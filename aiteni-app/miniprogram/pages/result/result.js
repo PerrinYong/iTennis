@@ -408,6 +408,202 @@ Page({
   },
 
   /**
+   * 生成分享图片
+   */
+  onShareImage() {
+    wx.showLoading({
+      title: '生成海报中...',
+    })
+
+    const query = wx.createSelectorQuery()
+    query.select('#shareCanvas')
+      .fields({ node: true, size: true })
+      .exec((res) => {
+        if (!res || !res[0]) {
+            wx.hideLoading()
+            wx.showToast({ title: 'Canvas初始化失败', icon: 'none' })
+            return
+        }
+        
+        const canvas = res[0].node
+        const ctx = canvas.getContext('2d')
+        const dpr = wx.getSystemInfoSync().pixelRatio
+        
+        // 设置画布尺寸
+        canvas.width = res[0].width * dpr
+        canvas.height = res[0].height * dpr
+        ctx.scale(dpr, dpr)
+        
+        // 绘制内容
+        this.drawShareContent(ctx, canvas, res[0].width, res[0].height)
+      })
+  },
+
+  /**
+   * 绘制海报内容
+   */
+  drawShareContent(ctx, canvas, width, height) {
+    const { result } = this.data
+    
+    // 1. 绘制背景 (使用品牌蓝渐变)
+    const gradient = ctx.createLinearGradient(0, 0, 0, height)
+    gradient.addColorStop(0, '#1D7CF2')
+    gradient.addColorStop(1, '#2A8CFF')
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, 0, width, height)
+    
+    // 2. 绘制装饰球 (右上角)
+    ctx.beginPath()
+    ctx.arc(width - 20, 40, 120, 0, 2 * Math.PI)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)'
+    ctx.fill()
+
+    // 3. 绘制标题
+    ctx.fillStyle = '#FFFFFF'
+    ctx.font = 'bold 20px sans-serif'
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'top'
+    ctx.fillText('我的网球水平等级', 32, 48)
+    
+    // 4. 绘制 NTRP 分数 (大号)
+    ctx.font = 'bold 80px sans-serif'
+    ctx.fillText(result.overallLevel.toString(), 32, 88)
+    
+    // NTRP 标签
+    ctx.font = 'bold 24px sans-serif'
+    const levelWidth = ctx.measureText(result.overallLevel.toString()).width
+    ctx.fillText('NTRP', 32 + levelWidth + 12, 134)
+    
+    // 5. 绘制等级描述
+    ctx.font = '16px sans-serif'
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
+    ctx.fillText(result.levelLabel, 32, 190)
+    
+    // 6. 绘制白色卡片区域 (用于展示优势)
+    const cardY = 250
+    const cardHeight = height - cardY - 120 // 留出底部空间
+    
+    // 圆角矩形
+    this.roundRect(ctx, 24, cardY, width - 48, cardHeight, 16)
+    ctx.fillStyle = '#FFFFFF'
+    ctx.fill()
+    
+    // 7. 绘制优势内容
+    ctx.fillStyle = '#1F2933'
+    ctx.font = 'bold 18px sans-serif'
+    ctx.fillText('主要优势', 48, cardY + 32)
+    
+    let currentY = cardY + 80
+    
+    if (result.advantages.length > 0) {
+      result.advantages.slice(0, 3).forEach((adv) => {
+        // 维度名称
+        ctx.fillStyle = '#1F2933'
+        ctx.font = 'bold 16px sans-serif'
+        ctx.fillText(adv.name, 48, currentY)
+        
+        // 分数胶囊
+        const scoreText = `${adv.score} 级`
+        ctx.font = '12px sans-serif'
+        const scoreWidth = ctx.measureText(scoreText).width + 20
+        const nameWidth = ctx.measureText(adv.name).width
+        
+        // 胶囊背景
+        ctx.fillStyle = 'rgba(29, 124, 242, 0.1)'
+        this.roundRect(ctx, 48 + nameWidth + 12, currentY + 2, scoreWidth, 20, 10)
+        ctx.fill()
+        
+        // 胶囊文字
+        ctx.fillStyle = '#1D7CF2'
+        ctx.fillText(scoreText, 48 + nameWidth + 22, currentY + 6)
+        
+        currentY += 40
+      })
+    } else {
+      ctx.fillStyle = '#6B7280'
+      ctx.font = '14px sans-serif'
+      ctx.fillText('各维度发展较为均衡', 48, currentY)
+    }
+    
+    // 8. 底部 Logo / 标语
+    ctx.fillStyle = '#FFFFFF'
+    ctx.font = '14px sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('AiTeni 智能网球评测', width / 2, height - 60)
+    ctx.font = '12px sans-serif'
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
+    ctx.fillText('扫码即刻测试', width / 2, height - 35)
+
+    // 9. 保存图片
+    this.saveCanvasToImage(canvas)
+  },
+
+  /**
+   * 绘制圆角矩形
+   */
+  roundRect(ctx, x, y, w, h, r) {
+    if (w < 2 * r) r = w / 2
+    if (h < 2 * r) r = h / 2
+    ctx.beginPath()
+    ctx.moveTo(x + r, y)
+    ctx.arcTo(x + w, y, x + w, y + h, r)
+    ctx.arcTo(x + w, y + h, x, y + h, r)
+    ctx.arcTo(x, y + h, x, y, r)
+    ctx.arcTo(x, y, x + w, y, r)
+    ctx.closePath()
+  },
+
+  /**
+   * 保存 Canvas 为图片
+   */
+  saveCanvasToImage(canvas) {
+    wx.canvasToTempFilePath({
+      canvas: canvas,
+      success: (res) => {
+        wx.saveImageToPhotosAlbum({
+          filePath: res.tempFilePath,
+          success: () => {
+            wx.hideLoading()
+            wx.showToast({
+              title: '已保存到相册',
+              icon: 'success'
+            })
+          },
+          fail: (err) => {
+            wx.hideLoading()
+            console.error('保存图片失败', err)
+            // 检查权限
+            if (err.errMsg.includes('auth')) {
+                wx.showModal({
+                    title: '提示',
+                    content: '需要保存到相册权限，请在设置中开启',
+                    success: (res) => {
+                        if (res.confirm) {
+                            wx.openSetting()
+                        }
+                    }
+                })
+            } else {
+                wx.showToast({
+                    title: '保存失败',
+                    icon: 'none'
+                })
+            }
+          }
+        })
+      },
+      fail: (err) => {
+        wx.hideLoading()
+        console.error('生成图片失败', err)
+        wx.showToast({
+          title: '生成失败',
+          icon: 'none'
+        })
+      }
+    })
+  },
+
+  /**
    * 分享结果
    */
   shareResult() {

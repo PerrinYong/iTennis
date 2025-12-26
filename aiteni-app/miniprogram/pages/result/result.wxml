@@ -26,7 +26,7 @@
             <text
               wx:for="{{result.advantageTags}}"
               wx:key="*this"
-              class="chip chip-blue"
+              class="chip chip-hero"
             >{{item}}</text>
           </view>
           
@@ -46,7 +46,7 @@
     </view>
 
     <!-- 分割线 -->
-    <view class="section-divider">
+    <view wx:if="{{showDetail}}" class="section-divider">
       <text class="section-divider-title">整体概览</text>
       <view class="section-divider-line"></view>
     </view>
@@ -166,13 +166,16 @@
         如果你只想抓重点练习，建议先在以上 2–3 个环节上持续投入时间，效果会最明显。
       </view>
       
-      <!-- 查看详情按钮 -->
-      <view wx:if="{{!showDetail}}" class="card-action">
+      <!-- 查看详情按钮 (移至底部栏) -->
+      <!-- <view wx:if="{{!showDetail}}" class="card-action">
         <button class="btn-text" bindtap="toggleDetail">
           查看完整评语 →
         </button>
-      </view>
+      </view> -->
     </view>
+
+    <!-- 底部占位符 -->
+    <view wx:if="{{!showDetail}}" class="bottom-spacer"></view>
 
     <!-- 各维度详细评估（仅在详细版显示） -->
     <view wx:if="{{showDetail}}" class="card card-soft">
@@ -227,4 +230,25 @@
       </view>
     </view>
   </view>
+
+  <!-- 底部操作栏 (仅简略版显示，且加载完成后显示) -->
+  <view wx:if="{{!isLoading && !showDetail}}" class="bottom-bar">
+    <button class="btn-bottom" bindtap="goBack">
+      <text class="btn-bottom-icon">⬅️</text>
+      <text class="btn-bottom-text">返回</text>
+    </button>
+    
+    <button class="btn-bottom" bindtap="toggleDetail">
+      <text class="btn-bottom-icon">📝</text>
+      <text class="btn-bottom-text">详细</text>
+    </button>
+    
+    <button class="btn-bottom btn-bottom--primary" bindtap="onShareImage">
+      <text class="btn-bottom-icon">📤</text>
+      <text class="btn-bottom-text">分享</text>
+    </button>
+  </view>
+
+  <!-- 绘图 Canvas (隐藏) -->
+  <canvas type="2d" id="shareCanvas" style="position: fixed; left: -9999px; width: 375px; height: 500px;"></canvas>
 </view>
