@@ -29,7 +29,11 @@ page {
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans", "Segoe UI", sans-serif;
   font-size: 28rpx;
   line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
+
 
 /* ==================== 通用页面容器（防溢出） ==================== */
 /* 所有页面外层容器，必须套此类避免内容贴顶 */
@@ -229,9 +233,4 @@ button::after{
 }
 
 
-page {
-  background: #f6f6f6;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
+/* 删除了重复的 page 定义 */

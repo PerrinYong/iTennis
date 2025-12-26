@@ -7,7 +7,7 @@
     <view wx:if="{{history.length === 0}}" class="empty-state">
       <text class="empty-icon">📝</text>
       <text class="empty-text">还没有评测记录</text>
-      <button class="btn-primary" style="width: 400rpx; margin-top: 40rpx;" bindtap="startTest">
+      <button class="btn-primary empty-btn" bindtap="startTest">
         开始评测
       </button>
     </view>

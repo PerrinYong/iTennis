@@ -211,36 +211,22 @@
         </view>
       </view>
 
-      <!-- 操作区域 -->
-      <view class="action-area">
-        <text class="action-text">
-          想把这些评估转化为具体训练内容？可以根据结果自动生成一份你的专属练习清单。
-        </text>
-        <!-- 暂时隐藏训练建议功能 -->
-        <!-- <button class="btn-primary" bindtap="getTrainingPlan">
-          查看训练建议
-        </button> -->
-        <button class="btn-text" bindtap="shareResult">
-          分享结果给教练
-          <text class="btn-text-icon">⤴</text>
-        </button>
-        <button class="btn-text" bindtap="toggleDetail">
-          收起详细评语 ↑
-        </button>
-      </view>
     </view>
+
+    <!-- 底部占位符 (详细版也需要) -->
+    <view wx:if="{{showDetail}}" class="bottom-spacer"></view>
   </view>
 
-  <!-- 底部操作栏 (仅简略版显示，且加载完成后显示) -->
-  <view wx:if="{{!isLoading && !showDetail}}" class="bottom-bar">
+  <!-- 底部操作栏 (详细版和简略版都显示) -->
+  <view wx:if="{{!isLoading}}" class="bottom-bar">
     <button class="btn-bottom" bindtap="goBack">
       <text class="btn-bottom-icon">⬅️</text>
       <text class="btn-bottom-text">返回</text>
     </button>
     
     <button class="btn-bottom" bindtap="toggleDetail">
-      <text class="btn-bottom-icon">📝</text>
-      <text class="btn-bottom-text">详细</text>
+      <text class="btn-bottom-icon">{{showDetail ? '⬆️' : '📝'}}</text>
+      <text class="btn-bottom-text">{{showDetail ? '收起' : '详细'}}</text>
     </button>
     
     <button class="btn-bottom btn-bottom--primary" bindtap="onShareImage">

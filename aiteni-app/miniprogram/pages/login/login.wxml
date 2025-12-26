@@ -2,13 +2,15 @@
 <view class="login-container">
   <!-- Logo和标题 -->
   <view class="header">
-    <view class="app-logo">🎾</view>
+    <view class="logo-box">
+      <text class="app-logo">🎾</text>
+    </view>
     <view class="app-name">爱特尼网球评测</view>
     <view class="app-desc">欢迎使用网球水平评估系统</view>
   </view>
 
-  <!-- 登录表单（使用微信官方推荐的头像昵称填写能力） -->
-  <view class="login-form">
+  <!-- 登录表单 -->
+  <view class="card card-soft login-form">
     <!-- 头像选择（微信官方推荐方式：open-type="chooseAvatar"） -->
     <view class="form-item">
       <view class="form-label">选择头像</view>
@@ -42,7 +44,7 @@
     
     <!-- 登录按钮 -->
     <button 
-      class="login-btn {{isLoading ? 'disabled' : ''}}" 
+      class="btn-primary login-btn {{isLoading ? 'disabled' : ''}}" 
       bindtap="wxLogin"
       disabled="{{isLoading}}"
     >

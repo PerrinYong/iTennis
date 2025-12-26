@@ -12,6 +12,11 @@
   padding: 32rpx;
 }
 
+.empty-btn {
+  width: 400rpx;
+  margin-top: 40rpx;
+}
+
 /* 历史记录列表 */
 .history-list {
   display: flex;

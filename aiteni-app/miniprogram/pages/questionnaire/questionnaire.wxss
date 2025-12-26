@@ -242,6 +242,7 @@
   display: flex;
   gap: 16rpx;
   padding: 16rpx 32rpx;
+  padding-bottom: calc(16rpx + constant(safe-area-inset-bottom));
   padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
   background: var(--card-white);
   border-top: 1rpx solid var(--border-gray);

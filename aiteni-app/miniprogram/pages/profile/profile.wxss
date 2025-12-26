@@ -1,135 +1,184 @@
 /* pages/profile/profile.wxss */
-.container {
-  min-height: 100vh;
-  background: #f5f5f5;
+/* 根容器使用全局 .page-container，无需重复定义背景 */
+
+.profile-header {
+  padding: 20rpx 40rpx;
+  margin-bottom: 20rpx;
 }
 
-.custom-navbar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20rpx;
-  text-align: center;
-}
-
-.navbar-title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: white;
-}
-
-/* 用户信息区域 */
-.user-section {
-  background: white;
-  margin: 20rpx;
-  border-radius: 20rpx;
+/* 用户卡片 */
+.user-card {
+  margin: 0 32rpx 32rpx;
+  display: flex;
+  align-items: center;
   padding: 40rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  position: relative;
+  width: 100%;
 }
 
 .avatar {
   width: 120rpx;
   height: 120rpx;
-  border-radius: 60rpx;
-  margin-right: 30rpx;
-  background: #eee;
+  border-radius: 50%;
+  margin-right: 32rpx;
+  background: var(--bg-gray);
+  border: 4rpx solid #FFFFFF;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+.avatar-placeholder {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  margin-right: 32rpx;
+  background: #F0F2F5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-icon {
+  font-size: 60rpx;
+  opacity: 0.4;
 }
 
 .user-details {
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 8rpx;
 }
 
 .nickname {
   font-size: 36rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 10rpx;
+  font-weight: 700;
+  color: var(--text-main);
 }
 
-.level {
-  font-size: 28rpx;
-  color: #999;
+.sub-text {
+  font-size: 26rpx;
+  color: var(--text-sub);
 }
 
-.arrow {
-  font-size: 50rpx;
-  color: #999;
-  font-weight: 300;
+.user-badge {
+  display: inline-flex;
 }
 
-/* 功能菜单区域 */
-.menu-section {
-  background: white;
-  margin: 20rpx;
-  border-radius: 20rpx;
+.badge-text {
+  font-size: 22rpx;
+  color: var(--primary-blue);
+  background: rgba(29, 124, 242, 0.1);
+  padding: 4rpx 16rpx;
+  border-radius: 999rpx;
+  font-weight: 500;
+}
+
+/* 菜单列表 */
+.menu-list {
+  padding: 0 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 32rpx;
+}
+
+.menu-card {
+  padding: 0;
   overflow: hidden;
+  margin-bottom: 0;
 }
 
 .menu-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 30rpx 40rpx;
-  border-bottom: 1rpx solid #f0f0f0;
-  background: white;
-}
-
-.menu-item:last-child {
-  border-bottom: none;
+  padding: 32rpx;
+  background: #FFFFFF;
+  transition: background-color 0.2s;
 }
 
 .menu-item:active {
-  background: #f8f8f8;
+  background: #F9FAFB;
+}
+
+.menu-divider {
+  height: 1rpx;
+  background: var(--border-gray);
+  margin: 0 32rpx;
 }
 
 .menu-left {
   display: flex;
   align-items: center;
-  flex: 1;
+  gap: 24rpx;
+}
+
+.icon-box {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-box-blue {
+  background: rgba(29, 124, 242, 0.1);
+  color: var(--primary-blue);
+}
+
+.icon-box-green {
+  background: rgba(31, 162, 122, 0.1);
+  color: var(--primary-green);
+}
+
+.icon-box-gray {
+  background: #F3F4F6;
+  color: #6B7280;
 }
 
 .menu-icon {
-  font-size: 40rpx;
-  margin-right: 24rpx;
+  font-size: 36rpx;
 }
 
 .menu-title {
-  font-size: 32rpx;
-  color: #333;
+  font-size: 30rpx;
+  color: var(--text-main);
+  font-weight: 500;
 }
 
-.menu-right {
-  display: flex;
-  align-items: center;
-}
-
-.menu-right .arrow {
+.arrow-icon {
   font-size: 40rpx;
-  color: #ccc;
+  color: #D1D5DB;
+  font-weight: 300;
 }
 
-/* 退出登录按钮 */
+/* 退出按钮 */
 .logout-section {
-  margin: 40rpx 20rpx 20rpx;
+  padding: 48rpx 32rpx;
 }
 
-.logout-btn {
+.btn-logout {
   width: 100%;
-  height: 90rpx;
-  line-height: 90rpx;
-  background: white;
-  color: #ff4444;
-  font-size: 32rpx;
-  border-radius: 20rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: #FFFFFF;
+  color: var(--danger);
+  font-size: 30rpx;
+  font-weight: 600;
+  border-radius: 999rpx;
+  border: 2rpx solid #FEE2E2;
+  box-shadow: 0 4rpx 12rpx rgba(220, 38, 38, 0.05);
+}
+
+.btn-logout:active {
+  background: #FEF2F2;
+}
+
+.btn-logout::after {
   border: none;
 }
 
-.logout-btn::after {
-  border: none;
-}
