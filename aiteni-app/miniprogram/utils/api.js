@@ -6,10 +6,10 @@
 const CONFIG = {
   // 后端API地址
   // 本地开发环境
-  BASE_URL: "http://182.92.109.59/api",
+  // BASE_URL: "http://182.92.109.59/api",
   
   // 生产环境（已部署SSL证书）
-  // BASE_URL: 'https://perrin-minigame.cloud/api',
+  BASE_URL: 'https://perrin-minigame.cloud/api',
   
   TIMEOUT: 30000 // 请求超时时间（毫秒）- 增加到30秒，因为需要调用微信接口
 }

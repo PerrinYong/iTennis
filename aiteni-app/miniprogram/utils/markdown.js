@@ -8,11 +8,13 @@
 
 const { debug } = require('./debug');
 
-// 普通状态下的高亮样式
-const normalStyle = 'background: rgba(255, 216, 74, 0.28); border-radius: 6rpx; padding: 2rpx 8rpx; font-weight: 650;';
+// 普通状态下的高亮样式 - 现代化的荧光笔效果（下半部分高亮）
+// 这种设计既醒目又不会遮挡文字，看起来更有设计感
+const normalStyle = 'background: linear-gradient(transparent 60%, rgba(255, 214, 10, 0.3) 60%); font-weight: 700; padding: 0 4rpx; color: inherit;';
 
-// 选中状态下的高亮样式
-const selectedStyle = 'background: rgba(29, 124, 242, 0.15); color: #1D7CF2; border-radius: 6rpx; padding: 2rpx 8rpx; font-weight: 700;';
+// 选中状态下的高亮样式 - 保持一致，仅稍微加深一点底色以适应选中态的视觉重心
+// 用户反馈不需要明显变化，所以去掉了反色设计
+const selectedStyle = 'background: linear-gradient(transparent 60%, rgba(255, 214, 10, 0.4) 60%); font-weight: 700; padding: 0 4rpx; color: inherit;';
 
 /**
  * 渲染Markdown文本为HTML
@@ -27,8 +29,6 @@ function renderMarkdown(text, isSelected = false) {
   
   // 将 **text** 转换为 <span style="...">text</span>
   const renderedHtml = text.replace(/\*\*([^*]+)\*\*/g, `<span style="${style}">$1</span>`);
-  
-  debug('markdown', `渲染Markdown: "${text.substring(0, 30)}..." -> "${renderedHtml.substring(0, 50)}..."`, `选中状态: ${isSelected}`);
   
   return renderedHtml;
 }
@@ -45,22 +45,9 @@ function renderOptionsText(options, selectedOptionId = '') {
     return [];
   }
   
-  debug('markdown', `处理 ${options.length} 个选项，选中ID: ${selectedOptionId}`);
-  
   return options.map((option, index) => {
     const isSelected = option.id === selectedOptionId;
     const htmlText = renderMarkdown(option.text, isSelected);
-    
-    if (index === 0) {
-      // 打印第一个选项的详细信息用于调试
-      debug('markdown', '第一个选项:', {
-        id: option.id,
-        isSelected,
-        原始文本预览: option.text.substring(0, 50) + '...',
-        HTML预览: htmlText.substring(0, 50) + '...',
-        包含粗体标记: option.text.includes('**')
-      });
-    }
     
     return {
       ...option,
@@ -73,4 +60,3 @@ module.exports = {
   renderMarkdown,
   renderOptionsText
 };
-
