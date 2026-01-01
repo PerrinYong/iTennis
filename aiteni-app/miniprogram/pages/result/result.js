@@ -14,12 +14,18 @@ const DIMENSION_NAMES = {
   training: '训练背景'
 }
 
+// 默认头像
+const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0';
+
 Page({
   data: {
     isLoading: true,
     safeTopPadding: 20, // 页面容器顶部安全留白（rpx）
     showDetail: false, // 是否显示详细版
     
+    // 用户信息
+    userInfo: null,
+
     // 评估结果数据
     result: null,
     resultId: null,
@@ -33,6 +39,11 @@ Page({
   onLoad(options) {
     // 初始化安全区域适配
     this.initSafeArea();
+
+    // 获取用户信息
+    const userInfo = wx.getStorageSync('userInfo') || null;
+    this.setData({ userInfo });
+
     // 加载评估结果
     if (options.resultId) {
       this.setData({ resultId: options.resultId })
@@ -539,6 +550,11 @@ Page({
 
     let y = P;
 
+    // === 用户信息 Header ===
+    const headerH = 64;
+    await this.drawUserHeader(ctx, canvas, P, y, cardW, headerH);
+    y += headerH + gap;
+
     // Hero 卡
     const heroH = 190;
     this.drawPosterHero(ctx, P, y, cardW, heroH, result);
@@ -575,6 +591,75 @@ Page({
     await this.drawFooter(ctx, canvas, width, height, qrCodePath);
     
     return true;
+  },
+
+  /**
+   * 绘制用户 Header (头像 + 昵称 + Title)
+   */
+  async drawUserHeader(ctx, canvas, x, y, w, h) {
+    const { userInfo } = this.data;
+    const avatarUrl = userInfo?.avatarUrl || defaultAvatarUrl;
+    const nickName = userInfo?.nickName || '网球爱好者';
+
+    // 背景：白色圆角矩形
+    ctx.save();
+    ctx.shadowColor = 'rgba(15, 23, 42, 0.06)';
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetY = 4;
+    this.fillRoundRect(ctx, x, y, w, h, h / 2, '#FFFFFF');
+    ctx.restore();
+
+    // 1. 绘制头像
+    const padding = 8; // 头像距离边缘的内边距
+    const avatarSize = h - padding * 2; 
+    const avatarX = x + padding;
+    const avatarY = y + padding;
+
+    try {
+      // 创建图片对象
+      const img = canvas.createImage();
+      await new Promise((resolve) => {
+        img.onload = resolve;
+        img.onerror = (e) => {
+            console.error('Avatar load error', e); 
+            resolve(); 
+        };
+        img.src = avatarUrl;
+      });
+
+      // 绘制圆形头像
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(img, avatarX, avatarY, avatarSize, avatarSize);
+      ctx.restore();
+
+    } catch (e) {
+      console.error('Draw avatar failed', e);
+      // 失败兜底：绘制灰色圆形
+      ctx.fillStyle = '#F0F2F5';
+      ctx.beginPath();
+      ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 2. 绘制文本
+    const textX = avatarX + avatarSize + 12;
+    const centerY = y + h / 2;
+
+    // 昵称
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    ctx.font = 'bold 18px sans-serif';
+    ctx.fillStyle = '#1F2933';
+    ctx.fillText(nickName, textX, centerY - 2);
+
+    // Title
+    ctx.textBaseline = 'top';
+    ctx.font = '13px sans-serif';
+    ctx.fillStyle = '#616E7C';
+    ctx.fillText('网球等级报告', textX, centerY + 2);
   },
 
   /**
