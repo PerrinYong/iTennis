@@ -424,6 +424,80 @@ Page({
   },
 
   /**
+   * 获取二维码（带重试机制）
+   */
+  async fetchQRCodeWithRetry(maxRetries = 3, retryDelay = 1000) {
+    const qrPath = this.data.resultId ? `pages/result/result?resultId=${this.data.resultId}` : 'pages/welcome/welcome';
+    
+    // 判断环境 (简单的环境判断，生产环境使用域名，开发环境使用IP)
+    const { miniProgram } = wx.getAccountInfoSync();
+    const API_BASE = (miniProgram.envVersion === 'release') 
+      ? 'https://perrin-minigame.cloud/api' 
+      : 'http://182.92.109.59/api';
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`[QRCode] 尝试获取二维码 (${attempt}/${maxRetries})`);
+        
+        const qrCodePath = await new Promise((resolve, reject) => {
+          wx.request({
+            url: `${API_BASE}/generate_qrcode`,
+            method: 'POST',
+            data: { path: qrPath, width: 200 },
+            responseType: 'arraybuffer',
+            timeout: 10000, // 10秒超时
+            success: (res) => {
+              if (res.statusCode === 200 && res.data) {
+                const fs = wx.getFileSystemManager();
+                const filePath = `${wx.env.USER_DATA_PATH}/share_qrcode_${Date.now()}.jpg`;
+                fs.writeFile({
+                  filePath,
+                  data: res.data,
+                  encoding: 'binary',
+                  success: () => {
+                    console.log('[QRCode] 二维码保存成功:', filePath);
+                    resolve(filePath);
+                  },
+                  fail: (e) => {
+                    console.error('[QRCode] 写入二维码文件失败', e);
+                    reject(new Error('写入文件失败'));
+                  }
+                });
+              } else {
+                console.error('[QRCode] API返回错误状态码:', res.statusCode);
+                reject(new Error(`API返回错误: ${res.statusCode}`));
+              }
+            },
+            fail: (e) => {
+              console.error('[QRCode] 请求二维码接口失败', e);
+              reject(new Error('网络请求失败'));
+            }
+          });
+        });
+
+        // 成功获取，返回路径
+        return qrCodePath;
+      } catch (error) {
+        console.error(`[QRCode] 第 ${attempt} 次尝试失败:`, error);
+        
+        // 如果不是最后一次尝试，等待后重试
+        if (attempt < maxRetries) {
+          console.log(`[QRCode] ${retryDelay}ms 后重试...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          // 指数退避：每次重试延迟时间增加
+          retryDelay *= 1.5;
+        } else {
+          // 所有重试都失败
+          console.error('[QRCode] 所有重试均失败，无法获取二维码');
+          throw new Error('二维码获取失败，请稍后重试');
+        }
+      }
+    }
+    
+    return null;
+  },
+
+  /**
    * 生成分享图片
    */
   async onShareImage() {
@@ -437,56 +511,40 @@ Page({
       title: '生成海报中...',
     });
 
-    // === 获取二维码 ===
+    // === 获取二维码（带重试） ===
     let qrCodePath = null;
     try {
-      const qrPath = this.data.resultId ? `pages/result/result?resultId=${this.data.resultId}` : 'pages/welcome/welcome';
-      
-      // 判断环境 (简单的环境判断，生产环境使用域名，开发环境使用IP)
-      const { miniProgram } = wx.getAccountInfoSync();
-      const API_BASE = (miniProgram.envVersion === 'release') 
-        ? 'https://perrin-minigame.cloud/api' 
-        : 'http://182.92.109.59/api';
-
-      qrCodePath = await new Promise((resolve) => {
-        wx.request({
-          url: `${API_BASE}/generate_qrcode`,
-          method: 'POST',
-          data: { path: qrPath, width: 200 },
-          responseType: 'arraybuffer',
-          success: (res) => {
-            if (res.statusCode === 200) {
-              const fs = wx.getFileSystemManager();
-              const filePath = `${wx.env.USER_DATA_PATH}/share_qrcode.jpg`;
-              fs.writeFile({
-                filePath,
-                data: res.data,
-                encoding: 'binary',
-                success: () => resolve(filePath),
-                fail: (e) => {
-                    console.error('写入二维码文件失败', e);
-                    resolve(null);
-                }
-              });
-            } else {
-              console.error('获取二维码API失败', res);
-              resolve(null);
-            }
-          },
-          fail: (e) => {
-            console.error('请求二维码接口失败', e);
-            resolve(null);
-          }
-        });
+      qrCodePath = await this.fetchQRCodeWithRetry(3, 1000);
+    } catch (error) {
+      console.error('[ShareImage] 二维码获取失败:', error);
+      wx.hideLoading();
+      this.setData({ isGeneratingImage: false });
+      wx.showModal({
+        title: '生成失败',
+        content: '无法获取分享二维码，请检查网络连接后重试。',
+        showCancel: false,
+        confirmText: '知道了'
       });
-    } catch (e) {
-      console.error('二维码流程异常', e);
+      return; // 阻止继续生成分享卡片
+    }
+
+    // 如果二维码获取失败，阻止生成
+    if (!qrCodePath) {
+      wx.hideLoading();
+      this.setData({ isGeneratingImage: false });
+      wx.showModal({
+        title: '生成失败',
+        content: '无法获取分享二维码，请稍后重试。',
+        showCancel: false,
+        confirmText: '知道了'
+      });
+      return;
     }
 
     const query = wx.createSelectorQuery();
     query.select('#shareCanvas')
       .fields({ node: true, size: true })
-      .exec((res) => {
+      .exec(async (res) => {
         if (!res || !res[0]) {
             wx.hideLoading();
             this.setData({ isGeneratingImage: false });
@@ -503,28 +561,38 @@ Page({
         canvas.height = res[0].height * dpr;
         ctx.scale(dpr, dpr);
         
-        // 绘制内容 (改为异步调用)
-        this.drawShareContent(ctx, canvas, res[0].width, res[0].height, qrCodePath)
-          .then(() => {
-             // 导出图片
-             wx.canvasToTempFilePath({
-               canvas: canvas,
-               success: (res) => {
-                 wx.hideLoading();
-                 this.setData({
-                   shareImage: res.tempFilePath,
-                   showSharePreview: true,
-                   isGeneratingImage: false
-                 });
-               },
-               fail: (err) => {
-                 wx.hideLoading();
-                 this.setData({ isGeneratingImage: false });
-                 console.error('生成图片失败', err);
-                 wx.showToast({ title: '生成失败', icon: 'none' });
-               }
-             });
+        try {
+          // 绘制内容 (使用 async/await 确保 this 上下文正确)
+          await this.drawShareContent(ctx, canvas, res[0].width, res[0].height, qrCodePath);
+          
+          // 导出图片
+          wx.canvasToTempFilePath({
+            canvas: canvas,
+            success: (res) => {
+              wx.hideLoading();
+              this.setData({
+                shareImage: res.tempFilePath,
+                showSharePreview: true,
+                isGeneratingImage: false
+              });
+            },
+            fail: (err) => {
+              wx.hideLoading();
+              this.setData({ isGeneratingImage: false });
+              console.error('[ShareImage] 生成图片失败', err);
+              wx.showToast({ title: '生成失败', icon: 'none' });
+            }
           });
+        } catch (error) {
+          wx.hideLoading();
+          this.setData({ isGeneratingImage: false });
+          console.error('[ShareImage] 绘制内容失败', error);
+          wx.showToast({ 
+            title: '生成失败: ' + (error.message || '未知错误'), 
+            icon: 'none',
+            duration: 3000
+          });
+        }
       });
   },
 
@@ -532,8 +600,19 @@ Page({
    * 绘制海报内容
    */
   async drawShareContent(ctx, canvas, width, height, qrCodePath) {
-    const { result } = this.data;
-    if (!result) return;
+    // 保存 this 引用，确保在异步操作中能正确访问
+    const self = this;
+    const { result } = self.data;
+    
+    if (!result) {
+      throw new Error('评估结果数据不存在');
+    }
+
+    // 检查必要的方法是否存在
+    if (typeof self.drawUserHeader !== 'function') {
+      console.error('[drawShareContent] drawUserHeader 方法不存在');
+      throw new Error('绘制方法未定义');
+    }
 
     // 清空
     ctx.clearRect(0, 0, width, height);
@@ -551,17 +630,24 @@ Page({
     let y = P;
 
     // === 用户信息 Header ===
-    const headerH = 64;
-    await this.drawUserHeader(ctx, canvas, P, y, cardW, headerH);
-    y += headerH + gap;
+    try {
+      const headerH = 64;
+      // 使用保存的 self 引用调用方法
+      await self.drawUserHeader(ctx, canvas, P, y, cardW, headerH);
+      y += headerH + gap;
+    } catch (error) {
+      console.error('[drawShareContent] 绘制用户Header失败:', error);
+      // 如果绘制Header失败，跳过继续绘制其他内容
+      // 不抛出错误，让分享卡片仍然可以生成（只是没有用户信息）
+    }
 
     // Hero 卡
     const heroH = 190;
-    this.drawPosterHero(ctx, P, y, cardW, heroH, result);
+    self.drawPosterHero(ctx, P, y, cardW, heroH, result);
     y += heroH + gap;
 
     // 优势卡（简略）- 只显示前2条以留出底部空间
-    y = this.drawPosterListCard(ctx, P, y, cardW, {
+    y = self.drawPosterListCard(ctx, P, y, cardW, {
       icon: '💪',
       title: '你的主要优势',
       dotColor: '#1FA27A',
@@ -575,7 +661,7 @@ Page({
     y += gap;
 
     // 短板卡（简略）- 只显示前2条以留出底部空间
-    y = this.drawPosterListCard(ctx, P, y, cardW, {
+    y = self.drawPosterListCard(ctx, P, y, cardW, {
       icon: '🎯',
       title: '当前最值得优先提升的环节',
       dotColor: '#F97316',
@@ -588,7 +674,7 @@ Page({
     });
 
     // === 绘制底部 Footer (Logo + Slogan + QR) ===
-    await this.drawFooter(ctx, canvas, width, height, qrCodePath);
+    await self.drawFooter(ctx, canvas, width, height, qrCodePath);
     
     return true;
   },
@@ -597,7 +683,9 @@ Page({
    * 绘制用户 Header (头像 + 昵称 + Title)
    */
   async drawUserHeader(ctx, canvas, x, y, w, h) {
-    const { userInfo } = this.data;
+    // 保存 this 引用，确保在异步操作中能正确访问
+    const self = this;
+    const { userInfo } = self.data;
     const avatarUrl = userInfo?.avatarUrl || defaultAvatarUrl;
     const nickName = userInfo?.nickName || '网球爱好者';
 
@@ -606,7 +694,7 @@ Page({
     ctx.shadowColor = 'rgba(15, 23, 42, 0.06)';
     ctx.shadowBlur = 12;
     ctx.shadowOffsetY = 4;
-    this.fillRoundRect(ctx, x, y, w, h, h / 2, '#FFFFFF');
+    self.fillRoundRect(ctx, x, y, w, h, h / 2, '#FFFFFF');
     ctx.restore();
 
     // 1. 绘制头像
